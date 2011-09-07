@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?><!-- $Id: pom.xml 336 2011-02-26 22:20:22Z ljnelson $ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>JPA Maven Plugin</name>
+  <description>JPA Maven Plugin</description>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junitVersion}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${mavenVersion}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>javax.persistence</artifactId>
+        <version>${javaxPersistenceVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.scannotation</groupId>
+        <artifactId>scannotation</artifactId>
+        <version>${scannotationVersion}</version>
+      </dependency>
+      
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.scannotation</groupId>
+      <artifactId>scannotation</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <compilerArgument>-Xlint:all</compilerArgument>
+            <encoding>UTF8</encoding>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+          <version>2.3.2</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <configuration>
+            <filesets>
+              <fileset>
+                <directory>${basedir}</directory>
+                <includes>
+                  <include>*~</include>
+                  <include>src/**/*~</include>
+                </includes>
+              </fileset>
+            </filesets>
+          </configuration>
+          <version>2.4.1</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.3.1</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <delimiters>
+              <delimiter>${*}</delimiter>
+            </delimiters>
+            <encoding>UTF8</encoding>
+            <escapeString>\</escapeString>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+          </configuration>
+          <version>2.5</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>          
+          <configuration>
+            <forkMode>always</forkMode>
+            <skip>true</skip>
+            <systemPropertyVariables>
+              <maven.project.build.directory>${project.build.directory}</maven.project.build.directory>
+            </systemPropertyVariables>
+            <useFile>false</useFile>
+          </configuration>
+          <version>2.9</version>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+    
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <testResources>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
+  </build>
+
+  <properties>
+
+    <!-- Versions -->
+    <eclipseLinkVersion>2.3.0</eclipseLinkVersion>
+    <javaxPersistenceVersion>2.0.3</javaxPersistenceVersion>
+    <junitVersion>4.8.2</junitVersion>
+    <mavenVersion>3.0.3</mavenVersion>
+    <scannotationVersion>1.0.2</scannotationVersion>
+
+  </properties>
+
+</project>
