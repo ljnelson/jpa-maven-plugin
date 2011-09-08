@@ -146,8 +146,9 @@
           </db>
           <defaultPropertyName>entityClassnames</defaultPropertyName>
           <encoding>UTF8</encoding>
+          <log implementation="com.edugility.jpa.maven.plugin.TestCaseConfiguration$SystemStreamLogWithDebugEnabled"/>
           <outputFile>entityClassnames.properties</outputFile>
-          <prefix><![CDATA[<class>]]></prefix>
+          <prefix implementation="java.lang.String"><![CDATA[<class>]]></prefix>
           <project implementation="org.apache.maven.plugin.testing.stubs.MavenProjectStub">
             <build>
               <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
@@ -159,7 +160,8 @@
           <propertyNames>
             <com.edugility>edugilityClasses</com.edugility>
           </propertyNames>
-          <suffix><![CDATA[</class>]]></suffix>
+          <suffix implementation="java.lang.String"><![CDATA[</class>
+]]></suffix>
         </configuration>
       </plugin>
     </plugins>

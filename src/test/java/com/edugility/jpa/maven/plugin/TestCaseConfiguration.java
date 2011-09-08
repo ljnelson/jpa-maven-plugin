@@ -36,6 +36,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.SystemStreamLog;
+
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
 import org.apache.maven.model.Build;
@@ -82,6 +85,8 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
     final Build build = this.mojo.project.getBuild();
     assertNotNull(build);
     assertNotNull(build.getTestOutputDirectory());
+    final File mojoTestOutputDirectory = new File(build.getTestOutputDirectory());
+    assertEquals(this.getTestOutputDirectory(), mojoTestOutputDirectory);
 
     final List<?> testClasspathElements = this.mojo.project.getTestClasspathElements();
     assertNotNull(testClasspathElements);
@@ -129,11 +134,22 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
       new File(this.getBuildDirectory(), 
                String.format("generated-test-sources%1$sjpa-maven-plugin%1$sentityClassnames.properties",
                              File.separator));
-    System.out.println("Properties file: " + propertiesFile);
     assertTrue(propertiesFile.canRead());
     assertTrue(propertiesFile.isFile());
     final Properties properties = new Properties();
-    properties.load(new FileReader(propertiesFile));
+    final FileReader reader = new FileReader(propertiesFile);
+    properties.load(reader);
+    reader.close();
+    assertNotNull(properties.getProperty("edugilityClasses"));
+  }
+
+  public static final class SystemStreamLogWithDebugEnabled extends SystemStreamLog {
+    
+    @Override
+    public boolean isDebugEnabled() {
+      return true;
+    }
+    
   }
 
 }
