@@ -124,10 +124,8 @@
         </plugin>
 
         <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>          
+          <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <forkMode>always</forkMode>
-            <skip>true</skip>
             <systemPropertyVariables>
               <maven.project.build.directory>${project.build.directory}</maven.project.build.directory>
             </systemPropertyVariables>

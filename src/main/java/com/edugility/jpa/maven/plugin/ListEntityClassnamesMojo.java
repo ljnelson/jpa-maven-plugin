@@ -69,7 +69,9 @@ import org.apache.maven.model.Build;
  * @requiresDependencyResolution test
  * @goal list-entity-classnames
  */
-public abstract class ListEntityClassnamesMojo extends AbstractJPAMojo {
+public class ListEntityClassnamesMojo extends AbstractJPAMojo {
+
+  static final String DEFAULT_SUBDIR_PREFIX = "generated-test-sources" + File.separator + "jpa-maven-plugin";
 
   private static final List<String> JPA_ANNOTATIONS = Arrays.asList("javax.persistence.Entity", "javax.persistence.MappedSuperclass", "javax.persistence.Embeddable", "javax.persistence.IdClass");
 
@@ -128,7 +130,7 @@ public abstract class ListEntityClassnamesMojo extends AbstractJPAMojo {
       final List<?> classpathElements;
       List<?> temp = null;
       try {
-        temp = this.project.getTestClasspathElements();
+        temp = this.project == null ? null : this.project.getTestClasspathElements();
       } catch (final DependencyResolutionRequiredException dependencyResolutionRequiredException) {
         throw new MojoFailureException(String.format("While trying to obtain the test classpath elements, a DependencyResolutionRequiredException was encountered."), dependencyResolutionRequiredException);
       } finally {
@@ -178,57 +180,67 @@ public abstract class ListEntityClassnamesMojo extends AbstractJPAMojo {
     return this.urls;
   }
 
-  private final String getProjectBuildOutputDirectoryName() throws MojoFailureException, MojoExecutionException {
-    if (this.project == null) {
-      throw new MojoExecutionException("this.project == null");
+  public final String getProjectBuildDirectoryName() {
+    String returnValue = null;
+    if (this.project != null) {
+      final Build build = this.project.getBuild();
+      if (build != null) {
+        final String buildDirectoryName = build.getDirectory();
+        if (buildDirectoryName != null) {
+          returnValue = buildDirectoryName;
+        }
+      }
     }
-    final Build build = this.project.getBuild();
-    if (build == null) {
-      throw new MojoExecutionException("this.project.getBuild() == null");
+    if (returnValue == null) {
+      returnValue = System.getProperty("maven.project.build.directory", 
+                                       System.getProperty("project.build.directory",
+                                                          System.getProperty("basedir", System.getProperty("user.dir", ".")) +
+                                                          File.separator + "target"));
     }
-    final String outputDirectoryName = build.getOutputDirectory();
-    if (outputDirectoryName == null) {
-      throw new MojoExecutionException("this.project.getBuild().getOutputDirectory() == null");
-    }
-    return outputDirectoryName;
+    return returnValue;
   }
 
   private final File initializeOutputFile() throws MojoFailureException, MojoExecutionException {
-    if (this.outputFile == null) {
-      final File projectBuildOutputDirectory = new File(this.getProjectBuildOutputDirectoryName());
-      final File outputDirectory = new File(projectBuildOutputDirectory, "generated-test-sources/jpa-maven-plugin");
+    this.outputFile = this.initializeOutputFile(this.outputFile);
+    return this.outputFile;
+  }
+
+  final File initializeOutputFile(File outputFile) throws MojoFailureException, MojoExecutionException {
+    if (outputFile == null) {
+      final File projectBuildDirectory = new File(this.getProjectBuildDirectoryName());
+      final File outputDirectory = new File(projectBuildDirectory, DEFAULT_SUBDIR_PREFIX);
       this.validateOutputDirectory(outputDirectory);
       this.outputFile = new File(outputDirectory, "entityClassnames.properties");
     } else {
-      if (!this.outputFile.isAbsolute()) {
-        final File projectBuildOutputDirectory = new File(this.getProjectBuildOutputDirectoryName());
-        final File outputDirectory = new File(projectBuildOutputDirectory, "generated-test-sources/jpa-maven-plugin");
+      if (!outputFile.isAbsolute()) {
+        final File projectBuildDirectory = new File(this.getProjectBuildDirectoryName());
+        final File outputDirectory = new File(projectBuildDirectory, DEFAULT_SUBDIR_PREFIX);
         this.validateOutputDirectory(outputDirectory);
-        this.outputFile = new File(outputDirectory, this.outputFile.getPath());
+        outputFile = new File(outputDirectory, outputFile.getPath());
       }
-      if (this.outputFile.isDirectory()) {
-        final File outputDirectory = this.outputFile;
+      if (outputFile.isDirectory()) {
+        final File outputDirectory = outputFile;
         this.validateOutputDirectory(outputDirectory);
-        this.outputFile = new File(outputDirectory, "entityClassnames.properties");
-      } else if (this.outputFile.exists()) {
-        if (!this.outputFile.isFile()) {
-          throw new MojoExecutionException(String.format("The outputFile specified, %s, is not a directory, but is also not a regular file.  The outputFile parameter must deisgnate either an existing, writable file or a non-existent file.", this.outputFile));
-        } else if (!this.outputFile.canWrite()) {
-          throw new MojoExecutionException(String.format("The outputFile specified, %s, is a regular file, but cannot be written to by Maven running as user %s.  The outputFile parameter must designate either an existing, writable file or a non-existent file.", this.outputFile, System.getProperty("user.name")));
+        outputFile = new File(outputDirectory, "entityClassnames.properties");
+      } else if (outputFile.exists()) {
+        if (!outputFile.isFile()) {
+          throw new MojoExecutionException(String.format("The outputFile specified, %s, is not a directory, but is also not a regular file.  The outputFile parameter must deisgnate either an existing, writable file or a non-existent file.", outputFile));
+        } else if (!outputFile.canWrite()) {
+          throw new MojoExecutionException(String.format("The outputFile specified, %s, is a regular file, but cannot be written to by Maven running as user %s.  The outputFile parameter must designate either an existing, writable file or a non-existent file.", outputFile, System.getProperty("user.name")));
         } else {
-          this.validateOutputDirectory(this.outputFile.getParentFile());
+          this.validateOutputDirectory(outputFile.getParentFile());
         }
       } else {
-        this.validateOutputDirectory(this.outputFile.getParentFile());
+        this.validateOutputDirectory(outputFile.getParentFile());
       }
     }
-    assert this.outputFile != null;
-    assert this.outputFile.isAbsolute();
+    assert outputFile != null;
+    assert outputFile.isAbsolute();
     final Log log = this.getLog();
     if (log != null && log.isDebugEnabled()) {
-      log.debug(String.format("Output file initialized to %s", this.outputFile));
+      log.debug(String.format("Output file initialized to %s", outputFile));
     }
-    return this.outputFile;
+    return outputFile;
   }
   
   private void validateOutputDirectory(final File outputDirectory) throws MojoFailureException, MojoExecutionException {
