@@ -132,10 +132,12 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
 
   public AnnotationDB cloneAnnotationDB() {
     if (this.db == null) {
-      return this.createAnnotationDB();
-    } else {
-      return this.db.clone();
+      this.db = this.createAnnotationDB();
     }
+    if (this.db == null) {
+      return null;
+    }
+    return this.db.clone();
   }
 
   public void setAnnotationDB(final AnnotationDB db) {

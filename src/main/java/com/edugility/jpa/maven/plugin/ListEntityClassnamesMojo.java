@@ -71,6 +71,8 @@ import org.apache.maven.model.Build;
  */
 public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
+  private static final String DEFAULT_OUTPUT_FILENAME = "entityClassnames.properties";
+
   static final String DEFAULT_SUBDIR_PREFIX = "generated-test-sources" + File.separator + "jpa-maven-plugin";
 
   private static final List<String> JPA_ANNOTATIONS = Arrays.asList("javax.persistence.Entity", "javax.persistence.MappedSuperclass", "javax.persistence.Embeddable", "javax.persistence.IdClass");
@@ -123,6 +125,22 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    */
   private Set<URL> urls;
 
+  public String getPrefix() {
+    return this.prefix;
+  }
+
+  public void setPrefix(final String prefix) {
+    this.prefix = prefix;
+  }
+
+  public String getSuffix() {
+    return this.suffix;
+  }
+  
+  public void setSuffix(final String suffix) {
+    this.suffix = suffix;
+  }
+
   private final Set<URL> initializeURLs() throws MojoFailureException, MojoExecutionException {
     if (this.urls == null) {
       final Log log = this.getLog();
@@ -136,8 +154,14 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       } finally {
         classpathElements = temp;
       }
-      Set<URL> urls = new LinkedHashSet<URL>(classpathElements == null ? 0 : classpathElements.size());
-      if (classpathElements != null && !classpathElements.isEmpty()) {
+      final Set<URL> urls;
+      if (classpathElements == null || classpathElements.isEmpty()) {
+        if (log.isWarnEnabled()) {
+          log.warn(String.format("The test classpath contained no elements. Consequently no Entities were found."));
+        }
+        urls = new LinkedHashSet<URL>(0);
+      } else {
+        urls = new LinkedHashSet<URL>(classpathElements.size());
         for (final Object o : classpathElements) {
           if (o != null) {
             final File file = new File(o.toString());
@@ -159,8 +183,6 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
             }
           }
         }
-      } else if (log.isWarnEnabled()) {
-        log.warn(String.format("The test classpath contained no elements. Consequently no Entities were found."));
       }
       if (log.isWarnEnabled() && urls.isEmpty()) {
         log.warn(String.format("No URLs were found from the test classpath (%s).", classpathElements));
@@ -210,7 +232,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       final File projectBuildDirectory = new File(this.getProjectBuildDirectoryName());
       final File outputDirectory = new File(projectBuildDirectory, DEFAULT_SUBDIR_PREFIX);
       this.validateOutputDirectory(outputDirectory);
-      this.outputFile = new File(outputDirectory, "entityClassnames.properties");
+      this.outputFile = new File(outputDirectory, DEFAULT_OUTPUT_FILENAME);
     } else {
       if (!outputFile.isAbsolute()) {
         final File projectBuildDirectory = new File(this.getProjectBuildDirectoryName());
@@ -221,7 +243,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       if (outputFile.isDirectory()) {
         final File outputDirectory = outputFile;
         this.validateOutputDirectory(outputDirectory);
-        outputFile = new File(outputDirectory, "entityClassnames.properties");
+        outputFile = new File(outputDirectory, DEFAULT_OUTPUT_FILENAME);
       } else if (outputFile.exists()) {
         if (!outputFile.isFile()) {
           throw new MojoExecutionException(String.format("The outputFile specified, %s, is not a directory, but is also not a regular file.  The outputFile parameter must deisgnate either an existing, writable file or a non-existent file.", outputFile));
@@ -259,6 +281,12 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
         throw new MojoFailureException(String.format("The output directory path, %s, does not exist because the attempt to create it failed.", outputDirectory));
       }
     }
+  }
+
+  private final void initialize() throws MojoFailureException, MojoExecutionException {
+    this.scrubParameters();
+    this.initializeURLs();
+    this.initializeOutputFile();
   }
 
   private void scrubParameters() {
@@ -345,11 +373,9 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
     if (log == null) {
       throw new MojoExecutionException("this.getLog() == null");
     }
+    this.initialize();
 
-    this.scrubParameters();
-    this.initializeURLs();
-
-    final File outputFile = this.initializeOutputFile();
+    final File outputFile = this.getOutputFile();
     assert outputFile != null;
 
     // Scan the test classpath for Entity, MappedSuperclass, IdClass,

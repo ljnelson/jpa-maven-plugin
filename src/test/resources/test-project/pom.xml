@@ -3,12 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.edugility</groupId>
-  <artifactId>jpa-maven-plugin</artifactId>
+  <artifactId>jpa-maven-plugin-test-project</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>maven-plugin</packaging>
 
-  <name>JPA Maven Plugin</name>
-  <description>JPA Maven Plugin</description>
+  <name>JPA Maven Plugin Test Project</name>
+  <description>JPA Maven Plugin Test Project (Do Not Deploy)</description>
 
   <dependencyManagement>
     <dependencies>
@@ -16,34 +15,15 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>${junitVersion}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-core</artifactId>
-        <version>${mavenVersion}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.plugin-testing</groupId>
-        <artifactId>maven-plugin-testing-harness</artifactId>
-        <version>${mavenPluginTestingHarnessVersion}</version>
+        <version>\${junitVersion}</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>javax.persistence</artifactId>
-        <version>${javaxPersistenceVersion}</version>
-        <scope>compile</scope> <!-- yes, compile; this is a plugin -->
-      </dependency>
-
-      <dependency>
-        <groupId>org.scannotation</groupId>
-        <artifactId>scannotation</artifactId>
-        <version>${scannotationVersion}</version>
+        <version>\${javaxPersistenceVersion}</version>
+        <scope>provided</scope>
       </dependency>
       
     </dependencies>
@@ -56,29 +36,20 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.plugin-testing</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>javax.persistence</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.scannotation</groupId>
-      <artifactId>scannotation</artifactId>
     </dependency>
   </dependencies>
 
   <build>
     <pluginManagement>
       <plugins>
+
+        <plugin>
+          <groupId>com.edugility</groupId>
+          <artifactId>jpa-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
+        </plugin>
 
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
@@ -101,7 +72,7 @@
           <configuration>
             <filesets>
               <fileset>
-                <directory>${basedir}</directory>
+                <directory>\${basedir}</directory>
                 <includes>
                   <include>*~</include>
                   <include>src/**/*~</include>
@@ -126,7 +97,7 @@
           <artifactId>maven-resources-plugin</artifactId>
           <configuration>
             <delimiters>
-              <delimiter>${*}</delimiter>
+              <delimiter>\${*}</delimiter>
             </delimiters>
             <encoding>UTF8</encoding>
             <escapeString>\</escapeString>
@@ -139,8 +110,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
-              <maven.project.build.directory>${project.build.directory}</maven.project.build.directory>
-              <maven.project.build.testOutputDirectory>${project.build.testOutputDirectory}</maven.project.build.testOutputDirectory>
+              <maven.project.build.directory>\${project.build.directory}</maven.project.build.directory>
             </systemPropertyVariables>
             <useFile>false</useFile>
           </configuration>
@@ -149,17 +119,61 @@
 
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>com.edugility</groupId>
+        <artifactId>jpa-maven-plugin</artifactId>
+        <configuration>
+          <db>
+            <ignoredPackages>
+              <ignoredPackage>com.google</ignoredPackage>
+              <ignoredPackage>com.sun</ignoredPackage>
+              <ignoredPackage>java</ignoredPackage>
+              <ignoredPackage>javax</ignoredPackage>
+              <ignoredPackage>liquibase</ignoredPackage>
+              <ignoredPackage>org.eclipse</ignoredPackage>
+              <ignoredPackage>org.glassfish</ignoredPackage>
+              <ignoredPackage>org.hamcrest</ignoredPackage>
+              <ignoredPackage>org.hibernate</ignoredPackage>
+              <ignoredPackage>org.jboss</ignoredPackage>
+              <ignoredPackage>org.junit</ignoredPackage>
+            </ignoredPackages>
+            <scanClassAnnotations>true</scanClassAnnotations>
+            <scanFieldAnnotations>false</scanFieldAnnotations>
+            <scanMethodAnnotations>false</scanMethodAnnotations>
+            <scanParameterAnnotations>false</scanParameterAnnotations>
+          </db>
+          <defaultPropertyName>entityClassnames</defaultPropertyName>
+          <encoding>UTF8</encoding>
+          <outputFile>entityClassnames.properties</outputFile>
+          <prefix><![CDATA[<class>]]></prefix>
+          <project implementation="org.apache.maven.plugin.testing.stubs.MavenProjectStub">
+            <build>
+              <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
+            </build>
+            <testClasspathElements>
+              <testClasspathElement>${project.build.testOutputDirectory}</testClasspathElement>
+            </testClasspathElements>
+          </project>
+          <propertyNames>
+            <com.edugility>edugilityClasses</com.edugility>
+          </propertyNames>
+          <suffix><![CDATA[</class>]]></suffix>
+        </configuration>
+      </plugin>
+    </plugins>
     
     <resources>
       <resource>
-        <directory>${basedir}/src/main/resources</directory>
+        <directory>\${basedir}/src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
 
     <testResources>
       <testResource>
-        <directory>${basedir}/src/test/resources</directory>
+        <directory>\${basedir}/src/test/resources</directory>
         <filtering>true</filtering>
       </testResource>
     </testResources>
@@ -169,12 +183,8 @@
   <properties>
 
     <!-- Versions -->
-    <eclipseLinkVersion>2.3.0</eclipseLinkVersion>
     <javaxPersistenceVersion>2.0.3</javaxPersistenceVersion>
     <junitVersion>4.8.2</junitVersion>
-    <mavenPluginTestingHarnessVersion>2.0-alpha-1</mavenPluginTestingHarnessVersion>
-    <mavenVersion>3.0.3</mavenVersion>
-    <scannotationVersion>1.0.2</scannotationVersion>
 
   </properties>
 
