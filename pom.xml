@@ -10,6 +10,41 @@
   <name>JPA Maven Plugin</name>
   <description>JPA Maven Plugin</description>
 
+  <licenses>
+    <license>
+      <comments>The MIT License</comments>
+      <distribution>repo</distribution>
+      <name>MIT</name>
+      <url>http://www.opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git://github.com/ljnelson/jpa-maven-plugin.git</connection>
+    <developerConnection>scm:git:https://ljnelson@github.com/ljnelson/jpa-maven-plugin.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/ljnelson/jpa-maven-plugin/</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>ljnelson</id>
+      <name>Laird Nelson</name>
+      <email>ljnelson@gmail.com</email>
+      <url>http://about.me/lairdnelson</url>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/ljnelson/jpa-maven-plugin/issues</url>
+  </issueManagement>
+
   <dependencyManagement>
     <dependencies>
 
@@ -169,7 +204,6 @@
   <properties>
 
     <!-- Versions -->
-    <eclipseLinkVersion>2.3.0</eclipseLinkVersion>
     <javaxPersistenceVersion>2.0.3</javaxPersistenceVersion>
     <junitVersion>4.8.2</junitVersion>
     <mavenPluginTestingHarnessVersion>2.0-alpha-1</mavenPluginTestingHarnessVersion>
