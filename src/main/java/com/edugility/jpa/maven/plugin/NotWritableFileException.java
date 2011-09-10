@@ -31,8 +31,25 @@ package com.edugility.jpa.maven.plugin;
 
 import java.io.File;
 
+/**
+ * A {@link FileException} indicating that the {@link File} in
+ * question was expected to {@linkplain File#canWrite() be writable},
+ * but was not.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class NotWritableFileException extends FileException {
 
+  /**
+   * Creates a new {@link NotWritableFileException}.
+   *
+   * @param file the {@link File} that was not writable; may be {@code
+   * null}
+   */
   public NotWritableFileException(final File file) {
     super(file);
   }

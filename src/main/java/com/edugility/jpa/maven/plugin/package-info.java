@@ -36,9 +36,9 @@
  *
  * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
  * 
- * @version {@code 1.0-SNAPSHOT}
+ * @version 1.0-SNAPSHOT
  *
- * @since {@code 1.0-SNAPSHOT}
+ * @since 1.0-SNAPSHOT
  *
  * @see <a
  * href="http://maven.apache.org/developers/mojo-api-specification.html">Maven

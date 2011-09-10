@@ -31,8 +31,25 @@ package com.edugility.jpa.maven.plugin;
 
 import java.io.File;
 
+/**
+ * A {@link FileException} indicating that the {@link File} in
+ * question was expected to {@linkplain File#isDirectory() be a
+ * directory}, but was not.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class NotDirectoryException extends FileException {
 
+  /**
+   * Creates a new {@link NotDirectoryException}.
+   *
+   * @param file the {@link File} that was not a directory; may be
+   * {@code null}
+   */
   public NotDirectoryException(final File file) {
     super(file);
   }

@@ -31,13 +31,69 @@ package com.edugility.jpa.maven.plugin;
 
 import java.io.File;
 
+/**
+ * A {@link FileException} that results from a {@link File}
+ * representing a directory failing validation of some kind.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ *
+ * @see FileException
+ */
 public abstract class DirectoryException extends FileException {
 
-  protected DirectoryException(final File file) {
-    super(file);
+  /**
+   * Creates a new {@link DirectoryException}.
+   *
+   * @param directory the {@link File} whose validation failure caused
+   * this {@link DirectoryException} to be thrown; may be {@code null}
+   */
+  protected DirectoryException(final File directory) {
+    super(directory);
   }
 
-  public File getDirectory() {
+  /**
+   * Creates a new {@link DirectoryException}.
+   *
+   * @param directory the {@link File} whose validation failure caused
+   * this {@link DirectoryException} to be thrown; may be {@code null}
+   *
+   * @param message a detail message further explaining this {@link
+   * DirectoryException}; may be {@code null}
+   */
+  protected DirectoryException(final File directory, final String message) {
+    super(directory, message);
+  }
+
+  /**
+   * Creates a new {@link DirectoryException}.
+   *
+   * @param directory the {@link File} whose validation failure caused
+   * this {@link DirectoryException} to be thrown; may be {@code null}
+   *
+   * @param cause the {@link Throwable} that contributed to this
+   * {@link DirectoryException}'s cause; may be {@code null}
+   *
+   * @param message a detail message further explaining this {@link
+   * DirectoryException}; may be {@code null}
+   */
+  protected DirectoryException(final File directory, final Throwable cause, final String message) {
+    super(directory, cause, message);
+  }
+
+  /**
+   * A convenience method that returns the return value of the {@link
+   * #getFile()} method.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the result of calling the {@link #getFile()} method, or
+   * {@code null}
+   */
+  public final File getDirectory() {
     return this.getFile();
   }
 

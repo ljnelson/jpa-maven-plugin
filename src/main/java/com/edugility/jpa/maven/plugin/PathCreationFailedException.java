@@ -31,8 +31,25 @@ package com.edugility.jpa.maven.plugin;
 
 import java.io.File;
 
+/**
+ * A {@link DirectoryException} indicating that the {@link File} in
+ * question had a path that should have been fully created by the
+ * {@link File#mkdirs()} method, but that this path creation failed.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class PathCreationFailedException extends DirectoryException {
 
+  /**
+   * Creates a new {@link PathCreationFailedException}.
+   *
+   * @param file the {@link File} in question whose path could not be
+   * created; may be {@code null}
+   */
   public PathCreationFailedException(final File file) {
     super(file);
   }

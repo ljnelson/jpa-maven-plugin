@@ -32,15 +32,75 @@ package com.edugility.jpa.maven.plugin;
 import java.io.File;
 import java.io.IOException;
 
+ /**
+  * An {@link IOException} that results from a {@link File} failing
+  * validation of some kind.
+  *
+  * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+  *
+  * @version 1.0-SNAPSHOT
+  *
+  * @since 1.0-SNAPSHOT
+  *
+  * @see DirectoryException
+  */
 public abstract class FileException extends IOException {
 
+  /**
+   * The {@link File} that failed validation.  This field may be
+   * {@code null}.
+   */
   private final File file;
 
+  /**
+   * Creates a new {@link FileException}.
+   *
+   * @param file the {@link File} whose validation failure caused this
+   * {@link FileException} to be thrown; may be {@code null}
+   */
   protected FileException(final File file) {
-    super();
+    this(file, (Throwable)null, (String)null);
+  }
+
+  /**
+   * Creates a new {@link FileException}.
+   *
+   * @param file the {@link File} whose validation failure caused this
+   * {@link FileException} to be thrown; may be {@code null}
+   *
+   * @param message a detail message further explaining this {@link
+   * FileException}; may be {@code null}
+   */
+  protected FileException(final File file, final String message) {
+    this(file, (Throwable)null, message);
+  }
+
+  /**
+   * Creates a new {@link FileException}.
+   *
+   * @param file the {@link File} whose validation failure caused this
+   * {@link FileException} to be thrown; may be {@code null}
+   *
+   * @param cause the {@link Throwable} that contributed to this
+   * {@link FileException}'s cause; may be {@code null}
+   *
+   * @param message a detail message further explaining this {@link
+   * FileException}; may be {@code null}
+   */
+  protected FileException(final File file, final Throwable cause, final String message) {
+    super(message, cause);
     this.file = file;
   }
 
+  /**
+   * Returns the {@link File} whose validation failure caused this
+   * {@link FileException} to be thrown.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the {@link File} whose validation failure caused this
+   * {@link FileException} to be thrown, or {@code null}
+   */
   public File getFile() {
     return this.file;
   }

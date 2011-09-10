@@ -53,7 +53,7 @@ public class AnnotationDB extends org.scannotation.AnnotationDB implements Clone
   public AnnotationDB() {
     super();
   }
-
+  
   /**
    * Creates a new {@link AnnotationDB}, performing a deep copy of the
    * state of the supplied {@link AnnotationDB}.
@@ -65,7 +65,7 @@ public class AnnotationDB extends org.scannotation.AnnotationDB implements Clone
     super();
     this.copyState(db);
   }
-
+  
   /**
    * Deeply copies all known state from the supplied {@link
    * AnnotationDB} to this one.
@@ -162,7 +162,11 @@ public class AnnotationDB extends org.scannotation.AnnotationDB implements Clone
   }
 
   /**
-   * {@inheritDoc}
+   * Sets whether this {@link AnnotationDB} should scan {@linkplain
+   * ElementType#METHOD method annotations}.
+   *
+   * @param scan whether to scan {@linkplain ElementType#METHOD method
+   * annotations}
    */
   @Override
   public void setScanMethodAnnotations(final boolean scan) {
@@ -182,7 +186,11 @@ public class AnnotationDB extends org.scannotation.AnnotationDB implements Clone
   }
 
   /**
-   * {@inheritDoc}
+   * Sets whether this {@link AnnotationDB} should scan {@linkplain
+   * ElementType#PARAMETER parameter annotations}.
+   *
+   * @param scan whether to scan {@linkplain ElementType#PARAMETER
+   * parameter annotations}
    */
   @Override
   public void setScanParameterAnnotations(final boolean scan) {
@@ -201,7 +209,11 @@ public class AnnotationDB extends org.scannotation.AnnotationDB implements Clone
   }
 
   /**
-   * {@inheritDoc}
+   * Sets whether this {@link AnnotationDB} should scan {@linkplain
+   * ElementType#TYPE class annotations}.
+   *
+   * @param scan whether to scan {@linkplain ElementType#TYPE class
+   * annotations}
    */
   @Override
   public void setScanClassAnnotations(final boolean scan) {

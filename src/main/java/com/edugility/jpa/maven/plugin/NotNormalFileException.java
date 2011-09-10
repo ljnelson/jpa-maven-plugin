@@ -31,8 +31,25 @@ package com.edugility.jpa.maven.plugin;
 
 import java.io.File;
 
+/**
+ * A {@link FileException} indicating that the {@link File} in
+ * question was expected to {@linkplain File#isFile() be a normal
+ * file}, but was not.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class NotNormalFileException extends FileException {
 
+  /**
+   * Creates a new {@link NotNormalFileException}.
+   *
+   * @param file the {@link File} that was not a normal file; may be
+   * {@code null}
+   */
   public NotNormalFileException(final File file) {
     super(file);
   }

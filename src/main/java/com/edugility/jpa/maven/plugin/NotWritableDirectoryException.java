@@ -31,8 +31,25 @@ package com.edugility.jpa.maven.plugin;
 
 import java.io.File;
 
+/**
+ * A {@link DirectoryException} indicating that the directory in
+ * question was expected to {@linkplain File#canWrite() be writable},
+ * but was not.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class NotWritableDirectoryException extends DirectoryException {
 
+  /**
+   * Creates a new {@link NotWritableDirectoryException}.
+   *
+   * @param directory the {@link File} that was neither a directory
+   * nor writable; may be {@code null}
+   */
   public NotWritableDirectoryException(final File directory) {
     super(directory);
   }
