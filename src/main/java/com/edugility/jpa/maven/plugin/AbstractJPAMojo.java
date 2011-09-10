@@ -163,7 +163,7 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
    * href="http://maven.apache.org/guides/mini/guide-configuring-plugins.html">Guide
    * to Configuring Plug-ins</a>
    */
-  protected AnnotationDB db;
+  private AnnotationDB db;
 
   /**
    * A {@link URLFilter} that will be used to construct the {@link
@@ -183,7 +183,7 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
    * href="http://maven.apache.org/guides/mini/guide-configuring-plugins.html">Guide
    * to Configuring Plug-ins</a>
    */
-  protected URLFilter urlFilter;
+  private URLFilter urlFilter;
 
   /**
    * Constructs a new {@link AbstractJPAMojo}.  No configuration
@@ -300,7 +300,7 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
    *
    * @see org.scannotation.AnnotationDB#classIndex
    */
-  public AnnotationDB cloneAnnotationDB() {
+  public final AnnotationDB cloneAnnotationDB() {
     if (this.db == null) {
       this.db = this.createAnnotationDB();
     }
@@ -347,7 +347,10 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
    * @see org.scannotation.AnnotationDB#scanArchives(URL[])
    */
   protected final AnnotationDB scan(final Set<URL> urls) throws IOException {
-    return this.scan(this.cloneAnnotationDB(), urls);
+    final AnnotationDB db = this.cloneAnnotationDB();
+    final AnnotationDB result = this.scan(db, urls);
+    assert result == db;
+    return result;
   }
 
   /**

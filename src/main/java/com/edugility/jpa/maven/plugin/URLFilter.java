@@ -31,20 +31,58 @@ package com.edugility.jpa.maven.plugin;
 
 import java.net.URL;
 
+import java.util.Collection; // for javadoc only
 import java.util.Set;
 
 import org.codehaus.plexus.util.FileUtils;
 
+ /**
+  * A filter that can cull a {@link Collection} of {@link URL}s.
+  *
+  * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+  *
+  * @version 1.0-SNAPSHOT
+  *
+  * @since 1.0-SNAPSHOT
+  */
 public class URLFilter {
   
+  /**
+   * The {@linkplain FileUtils Plexus <tt>FileUtils</tt>-compatible}
+   * {@link Set} of inclusion {@link String}s.
+   *
+   * <p>This field may be {@code null} at any point.</p>
+   */
   private Set<String> includes;
 
+  /**
+   * The {@linkplain FileUtils Plexus <tt>FileUtils</tt>-compatible}
+   * {@link Set} of exclusion {@link String}s.
+   *
+   * <p>This field may be {@code null} at any point.</p>
+   */
   private Set<String> excludes;
   
+  /**
+   * Creates a new {@link URLFilter}.
+   */
   public URLFilter() {
     super();
   }
 
+  /**
+   * Returns {@code true} if the supplied {@link URL} should be
+   * accepted.  This implementation returns {@code true} if the
+   * supplied {@link URL} is non-{@code null}.
+   *
+   * <p><strong>Note:</strong> inclusion and exclusion does not yet
+   * work.</p>
+   *
+   * @param url the {@link URL} to accept; may be {@code null}
+   *
+   * @return {@code true} if the supplied {@link URL} should be
+   * accepted; {@code false} otherwise
+   */
   public boolean accept(final URL url) {
     if (url == null) {
       return false;
@@ -52,18 +90,56 @@ public class URLFilter {
     return true;
   }
 
+  /**
+   * Sets the {@linkplain FileUtils Plexus
+   * <tt>FileUtils</tt>-compatible} {@link Set} of inclusion {@link
+   * String}s.
+   *
+   * @param includes the {@link Set} of {@link String}s to set; may be
+   * {@code null}
+   */
   public void setIncludes(final Set<String> includes) {
     this.includes = includes;
   }
 
+  /**
+   * Returns the {@linkplain FileUtils Plexus
+   * <tt>FileUtils</tt>-compatible} {@link Set} of inclusion {@link
+   * String}s.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the {@linkplain FileUtils Plexus
+   * <tt>FileUtils</tt>-compatible} {@link Set} of inclusion {@link
+   * String}s, or {@code null}
+   */
   public Set<String> getIncludes() {
     return this.includes;
   }
 
+  /**
+   * Sets the {@linkplain FileUtils Plexus
+   * <tt>FileUtils</tt>-compatible} {@link Set} of exclusion {@link
+   * String}s.
+   *
+   * @param excludes the {@link Set} of {@link String}s to set; may be
+   * {@code null}
+   */
   public void setExcludes(final Set<String> excludes) {
     this.excludes = excludes;
   }
 
+  /**
+   * Returns the {@linkplain FileUtils Plexus
+   * <tt>FileUtils</tt>-compatible} {@link Set} of exclusion {@link
+   * String}s.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the {@linkplain FileUtils Plexus
+   * <tt>FileUtils</tt>-compatible} {@link Set} of exclusion {@link
+   * String}s, or {@code null}
+   */
   public Set<String> getExcludes() {
     return this.excludes;
   }
