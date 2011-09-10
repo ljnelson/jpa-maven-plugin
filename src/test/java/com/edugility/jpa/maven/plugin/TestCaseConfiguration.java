@@ -41,6 +41,8 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 
+import org.apache.maven.project.MavenProject;
+
 import org.apache.maven.model.Build;
 
 import org.junit.After;
@@ -81,14 +83,15 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
   }
 
   public void testConfigurationWorked() throws Exception {
-    assertNotNull(this.mojo.project);
-    final Build build = this.mojo.project.getBuild();
+    final MavenProject project = this.mojo.getProject();
+    assertNotNull(project);
+    final Build build = project.getBuild();
     assertNotNull(build);
     assertNotNull(build.getTestOutputDirectory());
     final File mojoTestOutputDirectory = new File(build.getTestOutputDirectory());
     assertEquals(this.getTestOutputDirectory(), mojoTestOutputDirectory);
 
-    final List<?> testClasspathElements = this.mojo.project.getTestClasspathElements();
+    final List<?> testClasspathElements = project.getTestClasspathElements();
     assertNotNull(testClasspathElements);
     assertEquals(1, testClasspathElements.size());
     final String element = testClasspathElements.get(0).toString();

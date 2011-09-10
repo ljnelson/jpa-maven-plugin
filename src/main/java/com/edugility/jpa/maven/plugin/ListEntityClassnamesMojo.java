@@ -2,7 +2,7 @@
  *
  * $Id$
  *
- * Copyright (c) 2010-2011 Edugility LLC.
+ * Copyright (c) 2011 Edugility LLC.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -38,14 +38,16 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import java.net.URI; // for javadoc only
 import java.net.URL;
 import java.net.MalformedURLException;
 
 import java.util.Arrays;
+import java.util.Collection; // for javadoc only
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,11 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.persistence.Embeddable; // for javadoc only
+import javax.persistence.Entity; // for javadoc only
+import javax.persistence.IdClass; // for javadoc only
+import javax.persistence.MappedSuperclass; // for javadoc only
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 
@@ -66,132 +73,328 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.model.Build;
 
 /**
+ * Generates a {@code .properties} file, suitable for use as a Maven
+ * <a
+ * href="http://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html">filter</a>,
+ * whose contents are the set of names of classes that have been
+ * annotated with the {@link javax.persistence.Entity}, {@link
+ * javax.persistence.MappedSuperclass}, {@link
+ * javax.persistence.Embeddable} and {@link javax.persistence.IdClass}
+ * annotations.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ *
  * @requiresDependencyResolution test
+ *
  * @goal list-entity-classnames
+ *
+ * @see AbstractJPAMojo
+ *
+ * @see javax.persistence.Entity
+ *
+ * @see javax.persistence.MappedSuperclass
+ *
+ * @see javax.persistence.Embeddable
+ *
+ * @see javax.persistence.IdClass
  */
 public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
-  private static final String DEFAULT_OUTPUT_FILENAME = "entityClassnames.properties";
-
-  static final String DEFAULT_SUBDIR_PREFIX = "generated-test-sources" + File.separator + "jpa-maven-plugin";
-
-  private static final List<String> JPA_ANNOTATIONS = Arrays.asList("javax.persistence.Entity", "javax.persistence.MappedSuperclass", "javax.persistence.Embeddable", "javax.persistence.IdClass");
+  /**
+   * The property name to use for classnames that belong to the
+   * default package when {@linkplain #getDefaultPropertyName()
+   * another default property name} cannot be found.
+   */
+  private static final String DEFAULT_DEFAULT_PROPERTY_NAME = "entityClassnames";
 
   /**
-   * @parameter default-value="UTF8"
-   * @required
+   * The default {@linkplain File#getName() name} used in constructing
+   * the {@link #outputFile} when no output file has been specified.
+   */
+  private static final String DEFAULT_OUTPUT_FILENAME = String.format("%s.properties", DEFAULT_DEFAULT_PROPERTY_NAME);
+
+  /**
+   * The default subdirectory prefix that is <i>added to</i> the value
+   * of the current {@linkplain MavenProject Maven project}'s
+   * {@linkplain Build#getDirectory() build directory} when
+   * constructing a prefix for non-absolute output file
+   * specifications.
+   *
+   * <p>This field is package-private for unit testing purposes
+   * only.</p>
+   */
+  static final String DEFAULT_SUBDIR_PREFIX = String.format("generated-test-sources%1$sjpa-maven-plugin", File.separator);
+
+  /**
+   * The {@link List} of <a
+   * href="http://download.oracle.com/javaee/6/api/javax/persistence/package-summary.html">JPA</a>
+   * annotations that this {@link ListEntityClassnamesMojo} scans for.
+   * A class that has been annotated with one of these annotations
+   * must be made known to the JPA persistence unit in some fashion,
+   * which is the task with which this mojo provides assistance.
+   *
+   * @see Embeddable
+   *
+   * @see Entity
+   *
+   * @see IdClass
+   *
+   * @see MappedSuperclass
+   *
+   * @see <a href="http://jcp.org/en/jsr/detail?id=317">Java
+   * Persistence 2.0 Specification</a>
+   */
+  private static final List<String> JPA_ANNOTATIONS = Arrays.asList(Entity.class.getName(), MappedSuperclass.class.getName(), Embeddable.class.getName(), IdClass.class.getName());
+
+  /**
+   * The character encoding to use when writing the {@link
+   * #outputFile}.  The default value as configured by Maven will be
+   * {@code ${project.build.sourceEncoding}}.  This field may be
+   * {@code null} at any point.
+   *
+   * @parameter default-value="${project.build.sourceEncoding}" property="encoding"
    */
   private String encoding;
 
   /**
-   * @parameter default-value="${project.build.directory}${file.separator}generated-test-sources${file.separator}jpa-maven-plugin${file.separator}entityClassnames.properties"
-   * @required
+   * The {@link File} to which entity- and mapped superclass-annotated
+   * classnames will be written.  This field may be {@code null} at
+   * any point.  If this {@link File} is found to be relative, it will
+   * be relative to
+   * <tt>${project.build.directory}${file.separator}generated-test-sources${file.separator}jpa-maven-plugin${file.separator}</tt>.
+   *
+   * @parameter
+   * default-value="${project.build.directory}${file.separator}generated-test-sources${file.separator}jpa-maven-plugin${file.separator}entityClassnames.properties"
+   * property="outputFile"
    */
-  protected File outputFile;
+  private File outputFile;
 
   /**
+   * The property key under which the entity classname listing will be
+   * stored.  Maven will configure this by default to be {@code
+   * entityClassnames}.  This field may be {@code null} at any point.
+   *
    * @parameter default-value="entityClassnames"
-   * @required
+   * property="defaultPropertyName"
    */
   private String defaultPropertyName;
 
   /**
-   * @parameter
+   * A {@link Map} of property names indexed by package prefix
+   * segments.  Class names found belonging to packages that start
+   * with the given package prefix segment will be stored in the
+   * {@link #outputFile} indexed by the corresponding property name.
+   *
+   * <p>Segments in package names are delimited with a period ({@code
+   * .}).  The following are examples of package prefix segments:</p>
+   *
+   * <ul>
+   *
+   * <li>{@code com.foobar.biz}</li>
+   *
+   * <li>{@code com.foobar}</li>
+   *
+   * <li>{@code com}</li>
+   *
+   * </ul>
+   *
+   * @parameter property="propertyNames"
    */
   private Map<String, String> propertyNames;
 
   /**
-   * @parameter
+   * The textual prefix to prepend to the list of classnames.
+   * 
+   * @parameter default-value="" property="firstItemPrefix"
    */
   private String firstItemPrefix;
   
   /**
-   * @parameter default-value="<class>"
+   * The textual prefix to prepend to every element of the list of
+   * classnames, excluding the first element.
+   * 
+   * @parameter default-value="<class>" property="prefix"
    */
   private String prefix;
   
   /**
+   * The suffix to append to every element of the list of classnames,
+   * excluding the last element.  be {@code null} at any point.
+   *
    * @parameter default-value="</class>${line.separator}"
+   * property="suffix"
    */
   private String suffix;
   
   /**
-   * @parameter
+   * The suffix to append to the list of classnames.
+   *
+   * @parameter default-value="" property="lastItemSuffix"
    */
   private String lastItemSuffix;
 
   /**
-   * @parameter
+   * The {@link Set} of {@link URL}s to scan.  If not explicitly
+   * specified, this mojo will scan the test classpath.
+   * 
+   * @parameter property="URLs"
    */
   private Set<URL> urls;
 
+  /**
+   * Creates a new {@link ListEntityClassnamesMojo}.
+   */
+  public ListEntityClassnamesMojo() {
+    super();    
+    this.setDefaultPropertyName(DEFAULT_DEFAULT_PROPERTY_NAME);
+    this.setFirstItemPrefix("");
+    this.setPrefix("");
+    this.setSuffix("");
+    this.setLastItemSuffix("");
+  }
+
+  /**
+   * Returns the prefix prepended to every element of the list of
+   * classnames, excluding the first element.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the prefix prepended to every element of the list of
+   * classnames, excluding the first element, or {@code null}
+   *
+   * @see #setPrefix(String)
+   */
   public String getPrefix() {
     return this.prefix;
   }
 
+  /**
+   * Sets the prefix prepended to every element of the list of
+   * classnames, excluding the first element.
+   *
+   * @param prefix the prefix in question; may be {@code null}
+   *
+   * @see #getPrefix()
+   *
+   * @see #setFirstItemPrefix(String)
+   */
   public void setPrefix(final String prefix) {
     this.prefix = prefix;
   }
 
+  /**
+   * Returns the prefix prepended to the list of classnames.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the prefix prepended to the list of classnames, or {@code
+   * null}
+   *
+   * @see #getPrefix()
+   *
+   * @see #setFirstItemPrefix(String)
+   */
+  public String getFirstItemPrefix() {
+    return this.firstItemPrefix;
+  }
+
+  /**
+   * Sets the prefix prepended to the list of classnames.
+   *
+   * @param firstItemPrefix the prefix to be prepended to the list of
+   * classnames; may be {@code null}
+   *
+   * @see #getFirstItemPrefix()
+   *
+   * @see #setPrefix(String)
+   */
+  public void setFirstItemPrefix(final String firstItemPrefix) {
+    this.firstItemPrefix = firstItemPrefix;
+  }
+
+  /**
+   * Returns the suffix appended to every element of the list of
+   * classnames, excluding the last element.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the suffix appended to every element of the list of
+   * classnames, excluding the last element, or {@code null}
+   *
+   * @see #setSuffix(String)
+   */
   public String getSuffix() {
     return this.suffix;
   }
   
+  /**
+   * Sets the suffix appended to every element of the list of
+   * classnames, excluding the last element.
+   *
+   * @param suffix the suffix in question; may be {@code null}
+   *
+   * @see #getSuffix()
+   *
+   * @see #setLastItemSuffix(String)
+   */
   public void setSuffix(final String suffix) {
     this.suffix = suffix;
   }
 
-  private final Set<URL> initializeURLs() throws MojoFailureException, MojoExecutionException {
-    if (this.urls == null) {
-      final Log log = this.getLog();
-      assert log != null;
-      final List<?> classpathElements;
-      List<?> temp = null;
-      try {
-        temp = this.project == null ? null : this.project.getTestClasspathElements();
-      } catch (final DependencyResolutionRequiredException dependencyResolutionRequiredException) {
-        throw new MojoFailureException(String.format("While trying to obtain the test classpath elements, a DependencyResolutionRequiredException was encountered."), dependencyResolutionRequiredException);
-      } finally {
-        classpathElements = temp;
-      }
-      final Set<URL> urls;
-      if (classpathElements == null || classpathElements.isEmpty()) {
-        if (log.isWarnEnabled()) {
-          log.warn(String.format("The test classpath contained no elements. Consequently no Entities were found."));
-        }
-        urls = new LinkedHashSet<URL>(0);
-      } else {
-        urls = new LinkedHashSet<URL>(classpathElements.size());
-        for (final Object o : classpathElements) {
-          if (o != null) {
-            final File file = new File(o.toString());
-            if (file.canRead()) {
-              final URL url;
-              URL tempURL = null;
-              try {
-                tempURL = file.toURI().toURL();
-              } catch (final MalformedURLException wontHappen) {
-                throw new MojoExecutionException(String.format("While attempting to convert a file, %s, into a URL, a MalformedURLException was encountered.", file), wontHappen);
-              } finally {
-                url = tempURL;
-              }
-              if (url != null) {
-                urls.add(url);
-              }
-            } else if (log.isWarnEnabled()) {
-              log.warn(String.format("The test classpath element %s could not be read.", file));
-            }
-          }
-        }
-      }
-      if (log.isWarnEnabled() && urls.isEmpty()) {
-        log.warn(String.format("No URLs were found from the test classpath (%s).", classpathElements));
-      }
-      this.urls = urls;
+  /**
+   * Returns the suffix appended to the list of classnames.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the suffix appended to the list of classnames, or {@code
+   * null}
+   *
+   * @see #getSuffix()
+   *
+   * @see #setLastItemSuffix(String)
+   */
+  public String getLastItemSuffix() {
+    return this.lastItemSuffix;
+  }
+
+  /**
+   * Sets the suffix appended to the list of classnames.
+   *
+   * @param lastItemSuffix the suffix to be appended to the list of
+   * classnames; may be {@code null}
+   *
+   * @see #getLastItemSuffix()
+   *
+   * @see #setSuffix(String)
+   */
+  public void setLastItemSuffix(final String lastItemSuffix) {
+    this.lastItemSuffix = lastItemSuffix;
+  }
+
+  /**
+   * Initializes the {@link Set} of {@link URL}s to {@linkplain
+   * #scan() scan} and returns it.
+   *
+   * <p>This method calls {@link #setURLs(Set)} as part of its
+   * implementation.</p>
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the {@link Set} of {@link URL}s that will be returned by
+   * future calls to {@link #getURLs()}; never {@code null}
+   */
+  private final Set<URL> initializeURLs() throws DependencyResolutionRequiredException {
+    Set<URL> urls = this.getURLs();
+    if (urls == null) {
+      urls = this.getTestClasspathURLs();
     }
-    assert this.urls != null;
+    assert urls != null;
     final URLFilter urlFilter = this.getURLFilter();
-    final Iterator<URL> iterator = this.urls.iterator();
+    final Iterator<URL> iterator = urls.iterator();
     assert iterator != null;
     while (iterator.hasNext()) {
       final URL url = iterator.next();
@@ -199,13 +402,131 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
         iterator.remove();
       }
     }
-    return this.urls;
+    this.setURLs(urls);
+    return this.getURLs();
   }
 
+  /**
+   * Returns a {@link Set} of {@link URL}s that represents the test
+   * classpath.
+   *
+   * <p>This uses the {@linkplain #getProject() associated
+   * <tt>MavenProject</tt>} to {@linkplain
+   * MavenProject#getTestClasspathElements() supply the information}.
+   * If that {@link MavenProject} is {@code null}, then an {@linkplain
+   * Collection#isEmpty() empty} {@linkplain
+   * Collections#unmodifiableSet(Set) unmodifiable <tt>Set</tt>} is
+   * returned.</p>
+   *
+   * <p>{@link String}-to-{@link URL} conversion is accomplished like
+   * this:</p>
+   *
+   * <ul>
+   *
+   * <li>The {@link MavenProject#getTestClasspathElements()} method
+   * returns an untyped {@link List}.  There is no contractual
+   * guarantee about the type of its contents.  Each element is
+   * therefore treated as an {@link Object}.</li>
+   *
+   * <li>If the element is non-{@code null}, then its {@link
+   * Object#toString()} method is invoked.  The resulting {@link
+   * String} is used to {@linkplain File#File(String) construct a
+   * <tt>File</tt>}.</li>
+   *
+   * <li>The resulting {@link File}'s {@link File#toURI()} method is
+   * invoked and the {@linkplain URI result}'s {@link URI#toURL()}
+   * method is invoked.  The return value is added to the {@link Set}
+   * that will be returned.</li>
+   *
+   * </ul>
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return a {@link Set} of {@link URL}s representing the test
+   * classpath, never {@code null}.  The {@link Set}'s iteration order
+   * is guaranteed to be equal to that of the iteration order of the
+   * return value of the {@link
+   * MavenProject#getTestClasspathElements()} method.
+   *
+   * @exception DependencyResolutionRequiredException if the {@link
+   * MavenProject#getTestClasspathElements()} method throws a {@link
+   * DependencyResolutionRequiredException}
+   */
+  private final Set<URL> getTestClasspathURLs() throws DependencyResolutionRequiredException {
+    final Set<URL> urls;
+
+    final Log log = this.getLog();
+    assert log != null;
+    
+    final MavenProject project = this.getProject();
+    final List<?> classpathElements;
+    if (project == null) {
+      classpathElements = null;
+    } else {
+      classpathElements = project.getTestClasspathElements();
+    }
+
+    if (classpathElements == null || classpathElements.isEmpty()) {
+      if (log.isWarnEnabled()) {
+        log.warn(String.format("The test classpath contained no elements. Consequently no Entities were found."));
+      }
+      urls = Collections.emptySet();
+    } else {
+      final Set<URL> mutableUrls = new LinkedHashSet<URL>(classpathElements.size());
+      for (final Object o : classpathElements) {
+        if (o != null) {
+          final File file = new File(o.toString());
+          if (file.canRead()) {
+            try {
+              mutableUrls.add(file.toURI().toURL());
+            } catch (final MalformedURLException wontHappen) {
+              throw (InternalError)new InternalError(String.format("While attempting to convert a file, %s, into a URL, a MalformedURLException was encountered.", file)).initCause(wontHappen);
+            }
+          } else if (log.isWarnEnabled()) {
+            log.warn(String.format("The test classpath element %s could not be read.", file));
+          }
+        }
+      }
+      if (mutableUrls.isEmpty()) {
+        urls = Collections.emptySet();
+      } else {
+        urls = Collections.unmodifiableSet(mutableUrls);
+      }
+    }
+    if (log.isWarnEnabled() && urls.isEmpty()) {
+      log.warn(String.format("No URLs were found from the test classpath (%s).", classpathElements));
+    }
+    return urls;
+  }
+
+  /**
+   * Returns this {@link ListEntityClassnamesMojo}'s best guess as to
+   * its {@linkplain #getProject() related Maven project}'s
+   * {@linkplain Build#getDirectory() build directory}.  If this
+   * {@link ListEntityClassnamesMojo} actually has a {@link
+   * MavenProject} {@linkplain AbstractJPAMojo#getProject()
+   * installed}, it will use the return value of that {@link
+   * MavenProject}'s {@link MavenProject#getBuild() Build}'s 
+   * {@link Build#getDirectory() getDirectory()} method.  Otherwise, it will
+   * return the following:
+   *
+   * <pre>System.getProperty("maven.project.build.directory", 
+   *                    System.getProperty("project.build.directory",
+   *                                       String.format("%1$s%2$starget",
+   *                                                     System.getProperty("basedir",
+   *                                                                        System.getProperty("user.dir", ".")),
+   *                                                     File.separator)));</pre>
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the current project's <i>build directory</i> name; never
+   * {@code null}
+   */
   public final String getProjectBuildDirectoryName() {
     String returnValue = null;
-    if (this.project != null) {
-      final Build build = this.project.getBuild();
+    final MavenProject project = this.getProject();
+    if (project != null) {
+      final Build build = project.getBuild();
       if (build != null) {
         final String buildDirectoryName = build.getDirectory();
         if (buildDirectoryName != null) {
@@ -214,25 +535,73 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       }
     }
     if (returnValue == null) {
-      returnValue = System.getProperty("maven.project.build.directory", 
-                                       System.getProperty("project.build.directory",
-                                                          System.getProperty("basedir", System.getProperty("user.dir", ".")) +
-                                                          File.separator + "target"));
+      returnValue = 
+        System.getProperty("maven.project.build.directory", 
+                           System.getProperty("project.build.directory",
+                                              String.format("%1$s%2$starget",
+                                                            System.getProperty("basedir",
+                                                                               System.getProperty("user.dir", ".")),
+                                                            File.separator)));
     }
     return returnValue;
   }
 
+  /**
+   * Initializes the {@link #outputFile} field and returns its value.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the newly-set value of the {@link #outputFile} field;
+   * never {@code null}
+   *
+   * @exception MojoFailureException if the build fails as a result
+   *
+   * @exception MojoExecutionException if this mojo could not be executed
+   */
   private final File initializeOutputFile() throws MojoFailureException, MojoExecutionException {
-    this.outputFile = this.initializeOutputFile(this.outputFile);
-    return this.outputFile;
+    this.setOutputFile(this.initializeOutputFile(this.getOutputFile()));
+    return this.getOutputFile();
   }
 
+  /**
+   * Validates and "absolutizes" the supplied {@link File} and returns
+   * the corrected version.
+   *
+   * <p>The return value of this method is guaranteed to be a {@link
+   * File} that is:</p>
+   *
+   * <ul>
+   *
+   * <li>non-{@code null}</li>
+   *
+   * <li>{@linkplain File#isAbsolute() absolute}</li>
+   *
+   * <li>existent and {@linkplain File#canWrite() writable} or
+   * non-existent and {@linkplain File#getParentFile() parented} by a
+   * directory that is existent and writable</li>
+   *
+   * </ul>
+   *
+   * <p>If the supplied {@link File} is a relative {@link File}, then
+   * it will be made absolute by prepending it with the following
+   * platform-neutral path: <tt>${{@link Build#getDirectory()
+   * project.build.directory}}/generated-test-sources/jpa-maven-plugin/</tt></p>
+   *
+   * @param outputFile the {@link File} to validate
+   *
+   * @return the "absolutized" and validated value of the {@code
+   * outputFile} parameter; never {@code null}
+   *
+   * @exception MojoFailureException if the build fails as a result
+   *
+   * @exception MojoExecutionException if this mojo could not be executed
+   */
   final File initializeOutputFile(File outputFile) throws MojoFailureException, MojoExecutionException {
     if (outputFile == null) {
       final File projectBuildDirectory = new File(this.getProjectBuildDirectoryName());
       final File outputDirectory = new File(projectBuildDirectory, DEFAULT_SUBDIR_PREFIX);
       this.validateOutputDirectory(outputDirectory);
-      this.outputFile = new File(outputDirectory, DEFAULT_OUTPUT_FILENAME);
+      outputFile = new File(outputDirectory, DEFAULT_OUTPUT_FILENAME);
     } else {
       if (!outputFile.isAbsolute()) {
         final File projectBuildDirectory = new File(this.getProjectBuildDirectoryName());
@@ -265,7 +634,26 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
     return outputFile;
   }
   
-  private void validateOutputDirectory(final File outputDirectory) throws MojoFailureException, MojoExecutionException {
+  /**
+   * Ensures that the supplied {@link File}, after this method is
+   * invoked, will designate a {@linkplain File#isDirectory()
+   * directory} that {@linkplain File#mkdirs() exists} and is
+   * {@linkplain File#canWrite() writable}.
+   *
+   * @param outputDirectory the {@link File} to validate; must not be
+   * {@code null}
+   *
+   * @exception IllegalArgumentException if {@code outputDirectory} is
+   * {@code null}
+   *
+   * @return {@code true} if {@link File#mkdirs()} was invoked on
+   * {@code outputDirectory}; {@code false} otherwise
+   *
+   * @exception MojoFailureException if the build should fail as a
+   * result of misconfiguration
+   */
+  private boolean validateOutputDirectory(final File outputDirectory) throws MojoFailureException {
+    boolean mkdirs = false;
     if (outputDirectory == null) {
       throw new IllegalArgumentException("outputDirectory", new NullPointerException("outputDirectory == null"));
     } else if (outputDirectory.exists()) {
@@ -276,111 +664,203 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
         throw new MojoFailureException(String.format("The output directory path, %s, exists and is a directory, but Maven running as %s cannot write to it.", outputDirectory, System.getProperty("user.name")));
       }
     } else {
-      final boolean directoryCreationSuccess = outputDirectory.mkdirs();
-      if (!directoryCreationSuccess) {
+      mkdirs = outputDirectory.mkdirs();
+      if (!mkdirs) {
         throw new MojoFailureException(String.format("The output directory path, %s, does not exist because the attempt to create it failed.", outputDirectory));
       }
     }
+    return mkdirs;
   }
 
-  private final void initialize() throws MojoFailureException, MojoExecutionException {
-    this.scrubParameters();
+  /**
+   * Called by the {@link #execute()} method; initializes all fields
+   * to their defaults if for some reason they were not already set
+   * appropriately.
+   *
+   * <p>This method calls the following methods in order:
+   *
+   * <ol>
+   *
+   * <li>{@link #initializePropertyNames()}</li>
+   *
+   * <li>{@link #initializeURLs()}</li>
+   *
+   * <li>{@link #initializeOutputFile()}</li>
+   *
+   * </ol>
+   *
+   * @exception MojoFailureException if the build should fail
+   *
+   * @exception MojoExecutionException if this mojo could not execute
+   */
+  private final void initialize() throws DependencyResolutionRequiredException, MojoFailureException, MojoExecutionException {
+    this.initializePropertyNames();
     this.initializeURLs();
     this.initializeOutputFile();
   }
 
-  private void scrubParameters() {
-    if (this.encoding == null) {
-      this.encoding = "";
-    } else {
-      this.encoding = this.encoding.trim();
-    }
-    if (this.encoding.isEmpty()) {
-      this.encoding = "UTF8";
-    }
-
+  /**
+   * Called by the {@link #initialize()} method; sets up the {@link
+   * #propertyNames} field appropriately.
+   */
+  private final void initializePropertyNames() {
     if (this.propertyNames == null) {
       this.propertyNames = new HashMap<String, String>();
     }
-
     if (this.defaultPropertyName == null) {
-      this.defaultPropertyName = "";
+      this.propertyNames.put(DEFAULT_DEFAULT_PROPERTY_NAME, "");
     } else {
-      this.defaultPropertyName = this.defaultPropertyName.trim();
+      final String defaultPropertyName = this.defaultPropertyName.trim();
+      if (defaultPropertyName.isEmpty()) {
+        this.propertyNames.put(DEFAULT_DEFAULT_PROPERTY_NAME, "");
+      } else {
+        this.propertyNames.put(defaultPropertyName, "");
+      }
     }
-    if (this.defaultPropertyName.isEmpty()) {
-      this.defaultPropertyName = "entityClassnames";
-    }
-
-    if (this.firstItemPrefix == null) {
-      this.firstItemPrefix = "";
-    }
-
-    if (this.prefix == null) {
-      this.prefix = "";
-    }
-
-    if (this.suffix == null) {
-      this.suffix = "";
-    }
-
-    if (this.lastItemSuffix == null) {
-      this.lastItemSuffix = "";
-    }
-
   }
 
+  /**
+   * Returns the encoding used to write the {@link Properties} file
+   * that this mojo generates.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the encoding used to write the {@link Properties} file
+   * that this mojo generates, or {@code null}
+   */
+  public String getEncoding() {
+    return this.encoding;
+  }
+
+  /**
+   * Sets the encoding used to write the {@link Properties} file that
+   * this mojo generates.
+   *
+   * <p>If {@code null} is supplied to this method, then "{@code
+   * UTF8}" will be used instead.</p>
+   *
+   * @param encoding the encoding to use; may be {@code null} in which
+   * case "{@code UTF8}" will be used instead; otherwise the value is
+   * {@linkplain String#trim() trimmed} and used as-is
+   */
+  public void setEncoding(String encoding) {
+    if (encoding == null) {
+      encoding = "";
+    } else {
+      encoding = encoding.trim();
+    }
+    if (encoding.isEmpty()) {
+      this.encoding = "UTF8";
+    } else {
+      this.encoding = encoding;
+    }
+  }
+
+  /**
+   * Returns the output {@link File}.  This method does not perform
+   * any validation or initialization.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the output {@link File}, or {@code null}
+   *
+   * @see #initializeOutputFile()
+   */
   public File getOutputFile() {
     return this.outputFile;
   }
 
+  /**
+   * Sets the {@link File} to use as the output file parameter.  This
+   * method does not perform any validation or initialization.
+   *
+   * @param file the {@link File} to use; may be {@code null}
+   *
+   * @see #initializeOutputFile()
+   */
   public void setOutputFile(final File file) {
     this.outputFile = file;
   }
 
+  /**
+   * Returns the {@link Set} of {@link URL}s to scan for annotations.
+   * This method does not perform any validation or initialization.
+   *
+   * @return the {@link Set} of {@link URL}s to scan, or {@code null}
+   *
+   * @see #initializeURLs()
+   */
   public Set<URL> getURLs() {
     return this.urls;
   }
 
+  /**
+   * Sets the {@link Set} of {@link URL}s to scan for annotations.
+   * This method does not perform any validation or initialization.
+   *
+   * @param urls the {@link Set} of {@link URL}s to scan; may be
+   * {@code null}
+   *
+   * @see #initializeURLs()
+   */
   public void setURLs(final Set<URL> urls) {
     this.urls = urls;
   }
 
-  private final AnnotationDB scan() throws MojoExecutionException, MojoFailureException {
-    AnnotationDB db = this.cloneAnnotationDB();
-    final Set<URL> urls = this.getURLs();
-    if (urls == null || urls.isEmpty()) {
-      final Log log = this.getLog();
-      if (log != null && log.isWarnEnabled()) {
-        log.warn(String.format("There are no URLs to scan."));
-      }
-    } else {
-      if (db == null) {
-        throw new MojoExecutionException("this.cloneAnnotationDB() == null");
-      }
-      try {
-        db = this.scan(db, urls);
-      } catch (final IOException ioException) {
-        throw new MojoExecutionException(String.format("While trying to scan the test classpath (%s) for Entities, an IOException was encountered.", urls), ioException);
-      }
-    }
-    return db;
+  /**
+   * Scans the {@linkplain #getURLs() <tt>Set</tt> of <tt>URL</tt>s}
+   * this {@link ListEntityClassnamesMojo} has been configured with
+   * and returns the {@link AnnotationDB} that performed the scanning.
+   *
+   * <p>This method may return {@code null} in exceptional
+   * circumstances.</p>
+   *
+   * @return an {@link AnnotationDB} containing the scan results, or
+   * {@code null} if an {@linkplain #cloneAnnotationDB()
+   * <tt>AnnotationDB</tt> could not be found}
+   *
+   * @exception MojoExecutionException if this mojo could not execute
+   *
+   * @exception MojoFailureExcetpion if the build should fail
+   */
+  private final AnnotationDB scan() throws IOException, MojoExecutionException, MojoFailureException {
+    return this.scan(this.getURLs());
   }
 
+  /**
+   * Executes this mojo.
+   *
+   * @exception MojoExecutionException if this mojo could not be executed
+   *
+   * @exception MojoFailureException if the build should fail
+   */
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
     final Log log = this.getLog();
     if (log == null) {
       throw new MojoExecutionException("this.getLog() == null");
     }
-    this.initialize();
+    try {
+      this.initialize();
+    } catch (final DependencyResolutionRequiredException kaboom) {
+      throw new MojoExecutionException(String.format("Initialization of this mojo failed"), kaboom);
+    }
 
     final File outputFile = this.getOutputFile();
     assert outputFile != null;
 
     // Scan the test classpath for Entity, MappedSuperclass, IdClass,
     // etc. annotations.
-    final AnnotationDB db = this.scan();
+    final AnnotationDB db;
+    AnnotationDB tempDb = null;
+    try {
+      tempDb = this.scan();
+    } catch (final IOException kaboom) {
+      throw new MojoExecutionException("Execution failed because an IOException was encountered during URL scanning.", kaboom);
+    } finally {
+      db = tempDb;
+      tempDb = null;
+    }
     assert db != null;
 
     if (log.isDebugEnabled()) {
@@ -455,34 +935,41 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
       final Set<Entry<String, Set<String>>> entrySet = propertyNameIndex.entrySet();
       assert entrySet != null;
-      for (final Entry<String, Set<String>> entry : entrySet) {
-        assert entry != null;
 
-        // For every entry indexing a set of classes under a property
-        // name, stringify the set of classnames into a single
-        // StringBuilder.  Index that stringified set under the
-        // property name.  This Properties will be the contents of our file.
+      if (!entrySet.isEmpty()) {
 
-        final StringBuilder sb = new StringBuilder();
+        final String firstItemPrefix = this.getFirstItemPrefix();
+        final String prefix = this.getPrefix();
+        final String suffix = this.getSuffix();
+        final String lastItemSuffix = this.getLastItemSuffix();
 
-        final String propertyName = entry.getKey();
-        assert propertyName != null;
-
-        final Set<String> classNames = entry.getValue();
-        assert classNames != null;
-
-        final Iterator<String> classNamesIterator = classNames.iterator();
-        assert classNamesIterator != null;
-        assert classNamesIterator.hasNext();
-
-        while (classNamesIterator.hasNext()) {
-          final String className = classNamesIterator.next();
-          assert className != null;
-          sb.append(this.decorate(className, sb.length() <= 0, classNamesIterator.hasNext()));
+        for (final Entry<String, Set<String>> entry : entrySet) {
+          assert entry != null;
+          
+          // For every entry indexing a set of classes under a property
+          // name, stringify the set of classnames into a single
+          // StringBuilder.  Index that stringified set under the
+          // property name.  This Properties will be the contents of our file.
+          
+          final StringBuilder sb = new StringBuilder();
+          
+          final String propertyName = entry.getKey();
+          assert propertyName != null;
+          
+          final Set<String> classNames = entry.getValue();
+          assert classNames != null;
+          
+          final Iterator<String> classNamesIterator = classNames.iterator();
+          assert classNamesIterator != null;
+          assert classNamesIterator.hasNext();
+          
+          while (classNamesIterator.hasNext()) {
+            sb.append(this.decorate(classNamesIterator.next(), sb.length() <= 0 ? firstItemPrefix : prefix, classNamesIterator.hasNext() ? suffix : lastItemSuffix));
+          }
+          
+          properties.setProperty(propertyName, sb.toString());
+          
         }
-
-        properties.setProperty(propertyName, sb.toString());
-
       }
 
     }
@@ -517,50 +1004,129 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
   }
 
-  private final String determinePropertyName(final String className) {
-    String propertyName = this.defaultPropertyName;
-    if (className != null && !className.isEmpty()) {
-      final Log log = this.getLog();
-      assert log != null;
+  /**
+   * Returns the property name to use for the names of {@link Class}es
+   * that belong to the default package.
+   *
+   * <p>This method may return {@code null}.  However, other portions
+   * of this mojo's code may substitute a default value in such
+   * cases.</p>
+   *
+   * @return the property name to use for the names of {@link Class}es
+   * that belong to the default package, or {@code null}
+   */
+  public String getDefaultPropertyName() {
+    return this.defaultPropertyName;
+  }
 
-      final int index = Math.max(0, className.lastIndexOf('.'));
-      String packageName = className.substring(0, index);
-      assert packageName != null;
-      
-      log.debug("Package: " + packageName);
-      
-      propertyName = this.propertyNames.get(packageName);
-      while (propertyName == null && packageName != null && !packageName.isEmpty()) {
-        final int dotIndex = Math.max(0, packageName.lastIndexOf('.'));
-        packageName = packageName.substring(0, dotIndex);
-        log.debug("Package: " + packageName);
+  /**
+   * Sets the property name to use for the names of {@link Class}es
+   * that belong to the default package.
+   *
+   * @param defaultPropertyName the property name; may be {@code
+   * null}, but this mojo may use a default value instead
+   */
+  public void setDefaultPropertyName(String defaultPropertyName) {
+    if (defaultPropertyName == null) {
+      defaultPropertyName = "";
+    } else {
+      defaultPropertyName = defaultPropertyName.trim();
+    }
+    if (defaultPropertyName.isEmpty()) {
+      defaultPropertyName = DEFAULT_DEFAULT_PROPERTY_NAME;
+    }
+    this.defaultPropertyName = defaultPropertyName;
+  }
+
+  /**
+   * Returns the appropriate property name given a {@linkplain Class#getName() class name}.
+   *
+   * <p>If the supplied {@code className} is {@code null} or consists
+   * solely of {@linkplain Character#isWhitespace(char) whitespace},
+   * then the {@linkplain #getDefaultPropertyName() default property
+   * name} is returned.<p>
+   *
+   * <p>Otherwise, a property name is 
+   */
+  public final String determinePropertyName(String className) {
+    String propertyName = this.defaultPropertyName;
+    if (className != null) {
+      className = className.trim();
+      if (!className.isEmpty()) {
+        final Log log = this.getLog();
+        assert log != null;
+        
+        final int index = Math.max(0, className.lastIndexOf('.'));
+        String packageName = className.substring(0, index);
+        assert packageName != null;
+        
+        if (log.isDebugEnabled()) {
+          log.debug("Package: " + packageName);
+        }
+        
         propertyName = this.propertyNames.get(packageName);
+        while (propertyName == null && packageName != null && !packageName.isEmpty()) {
+          final int dotIndex = Math.max(0, packageName.lastIndexOf('.'));
+          packageName = packageName.substring(0, dotIndex);
+          if (log.isDebugEnabled()) {
+            log.debug("Package: " + packageName);
+          }
+          propertyName = this.propertyNames.get(packageName);
+        }
+        if (log.isDebugEnabled()) {
+          log.debug("propertyName: " + propertyName);
+        }
       }
-      
-      log.debug("propertyName: " + propertyName);
     }
     return propertyName;
   }
 
-  protected String decorate(final String classname, final boolean first, final boolean more) {
+  /**
+   * Decorates the supplied {@link Class#getName() class name} with
+   * the supplied {@code prefix} and {@code suffix} parameters and
+   * returns the result.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @param classname the class name to decorate; if {@code null} then
+   * {@code null} will be returned
+   *
+   * @param prefix the prefix to decorate with; may be {@code null}
+   *
+   * @param suffix the suffix to decorate with; may be {@code null}
+   *
+   * @return the decorated class name, or {@code null}
+   */
+  protected String decorate(final String classname,
+                            final String prefix,
+                            final String suffix) {
+    final String returnValue;
     if (classname == null) {
-      return null;
-    }
-    final StringBuilder sb = new StringBuilder();
-    if (!first) {
-      sb.append(this.prefix);
+      returnValue = null;
     } else {
-      sb.append(this.firstItemPrefix);
+      final StringBuilder sb = new StringBuilder();     
+      if (prefix != null) {
+        sb.append(prefix); 
+      }
+      sb.append(classname);
+      if (suffix != null) {
+        sb.append(suffix);
+      }
+      returnValue = sb.toString();
     }
-    sb.append(classname);
-    if (more) {
-      sb.append(this.suffix);
-    } else {
-      sb.append(this.lastItemSuffix);
-    }
-    return sb.toString();
+    return returnValue;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation overrides that of {@link AbstractJPAMojo}
+   * to ensure that the created {@link AnnotationDB} {@linkplain
+   * AnnotationDB#setScanClassAnnotations(boolean) only scans
+   * <tt>Class</tt>-level annotations}.</p>
+   *
+   * @return {@inheritDoc}
+   */
   @Override
   protected AnnotationDB createAnnotationDB() {
     final AnnotationDB db = new AnnotationDB();

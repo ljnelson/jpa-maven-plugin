@@ -27,45 +27,23 @@
  * The original copy of this license is available at
  * http://www.opensource.org/license/mit-license.html.
  */
+
+/**
+ * Provides <a
+ * href="http://maven.apache.org/developers/mojo-api-specification.html">mojo</a>
+ * classes and interfaces for helping with JPA-related tasks during a
+ * Maven build.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ * 
+ * @version {@code 1.0-SNAPSHOT}
+ *
+ * @since {@code 1.0-SNAPSHOT}
+ *
+ * @see <a
+ * href="http://maven.apache.org/developers/mojo-api-specification.html">Maven
+ * mojo API specification</a>
+ *
+ * @see com.edugility.jpa.maven.plugin.ListEntityClassnamesMojo
+ */
 package com.edugility.jpa.maven.plugin;
-
-import java.net.URL;
-
-import java.util.Set;
-
-import org.codehaus.plexus.util.FileUtils;
-
-public class URLFilter {
-  
-  private Set<String> includes;
-
-  private Set<String> excludes;
-  
-  public URLFilter() {
-    super();
-  }
-
-  public boolean accept(final URL url) {
-    if (url == null) {
-      return false;
-    }
-    return true;
-  }
-
-  public void setIncludes(final Set<String> includes) {
-    this.includes = includes;
-  }
-
-  public Set<String> getIncludes() {
-    return this.includes;
-  }
-
-  public void setExcludes(final Set<String> excludes) {
-    this.excludes = excludes;
-  }
-
-  public Set<String> getExcludes() {
-    return this.excludes;
-  }
-
-}

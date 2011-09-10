@@ -1,0 +1,31 @@
+ ------
+ Usage
+ ------
+ Laird Nelson
+ ------
+ 2011-09-09
+ ------
+
+Usage
+
+* List entity classnames in a <<<.properties>>> file suitable for filtering
+
++-----+
+mvn jpa:list-entity-classnames
++-----+
+
+ Upon executing this command, the JPA Maven Plugin will scan your test
+ classpath and discover all classes that have been annotated with
+ either the <<<@Entity>>>, <<<@MappedSuperclass>>> or <<<@IdClass>>>
+ annotations, and will generate a <<<.properties>>> file in
+ <<<$\{{{{http://maven.apache.org/pom.html#BaseBuild_Element}project.build.directory}}\}/generated-test-sources/jpa-maven-plugin>>>.
+ In the absence of further configuration, the file will be named
+ <<<entityClassnames.properties>>> and will have a single property key
+ named <<<entityClassnames>>>.  The value of this property will be a
+ string that is suitable for inclusion into your
+ <<<src/test/resources/META-INF/persistence.xml>>> file like this:
+
++---+
+<class>${entityClassnames}</class>
++---+
+
