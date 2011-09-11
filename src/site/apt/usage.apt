@@ -1,31 +1,74 @@
- ------
- Usage
- ------
- Laird Nelson
- ------
- 2011-09-09
- ------
+                                ------
+                                Usage
+                                ------
+                             Laird Nelson
+                                ------
+                              2011-09-09
+                                ------
 
 Usage
 
-* List entity classnames in a <<<.properties>>> file suitable for filtering
+* Summary
 
-+-----+
-mvn jpa:list-entity-classnames
-+-----+
+ The <<<jpa-maven-plugin>>> is a standard Maven plugin.  Currently
+ there is only one goal: <<<list-entity-classnames>>>.  The
+ <<<list-entity-classnames>>> goal binds by default to the
+ <<<process-test-classes>>> phase.  Without any additional
+ configuration, the plugin produces a file named
+ <<<entityClassnames.properties>>> in the
+ <<<target/generated-test-sources/jpa-maven-plugin>>> directory.
 
- Upon executing this command, the JPA Maven Plugin will scan your test
- classpath and discover all classes that have been annotated with
- either the <<<@Entity>>>, <<<@MappedSuperclass>>> or <<<@IdClass>>>
- annotations, and will generate a <<<.properties>>> file in
- <<<$\{{{{http://maven.apache.org/pom.html#BaseBuild_Element}project.build.directory}}\}/generated-test-sources/jpa-maven-plugin>>>.
- In the absence of further configuration, the file will be named
- <<<entityClassnames.properties>>> and will have a single property key
- named <<<entityClassnames>>>.  The value of this property will be a
- string that is suitable for inclusion into your
- <<<src/test/resources/META-INF/persistence.xml>>> file like this:
+* Installation
+
+ "Install" the plugin as you would any other Maven plugin.  In your
+ <<<<build>>>>'s <<<<plugins>>>> stanza, include a <<<<plugin>>>>
+ element referencing the <<<jpa-maven-plugin>>>:
 
 +---+
-<class>${entityClassnames}</class>
+  <plugin>
+    <groupId>com.edugility</groupId>
+    <artifactId>jpa-maven-plugin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <executions>
+      <execution>
+        <id>Generate properties file with entity classnames in it</id>
+        <goals>
+          <goal>list-entity-classnames</goal>
+        </goals>
+      </execution>
+    </executions>
+  </plugin>
 +---+
+
+ This stanza sets up a single <<<execution>>> with an arbitrarily
+ named <<<id>>> that says to run the <<<list-entity-classnames>>>
+ goal during its default phase (<<<process-test-classes>>>).  All
+ configuration elements are set to their default values by virtue of
+ the fact they are not specified here.
+
+* Default configuration
+
+ You can use the plugin in this state.  By default it will:
+
+  * Scan your test classpath
+
+  * Find all entities, mapped superclasses, id classes and embeddables
+
+  * Create a <<<.properties>>> file named
+    <<<entityClassnames.properties>>> in the
+    <<<${project.build.directory}/generated-test-sources/jpa-maven-plugin>>>
+    directory
+
+  * Place a single property named <<<entityClassnames>>> in that file
+    whose value will be a list of the classnames it found.
+
+    * Each class name in the value will be prefixed with <<<<class>>>>
+      and suffixed with <<<</class>>>>, with the exception of the
+      first and last elements.
+
+    * The first element will be suffixed with <<<</class>>>>, but will
+      have no prefix.
+
+    * The last element will be prefixed with <<<<class>>>> but will
+      have no suffix.
 
