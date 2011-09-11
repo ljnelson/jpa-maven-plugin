@@ -1,0 +1,116 @@
+                               ------
+                              Rationale
+                               ------
+                             Laird Nelson
+                               ------
+                              2011-09-10
+                               ------
+
+Rationale
+
+ This project was created because I wanted to be able to create a
+ bunch of JPA entities and to claim truthfully that they were:
+
+  * <<Specification compliant.>> I didn't want to create
+    {{{http://hibernate.org/}Hibernate}}- or
+    {{{http://www.eclipse.org/eclipselink/}EclipseLink}}-specific
+    entities, but {{{http://jcp.org/en/jsr/detail?id=317}JPA
+    2.0}}-compliant entities.
+
+  * <<Vendor tolerant.>>  Being specification-compliant is one thing;
+    being specification-compliant and tolerant of vendors' shortcomings
+    is another.  I wanted my entities to be both.
+
+ The only way to accomplish both objectives was through rigorous unit
+ and integration testing.
+
+ While I was researching the best way to test these entities in a JPA
+ environment, I had lots of different solutions suggested to me, not
+ the least of which was the
+ {{{http://www.jboss.org/arquillian/}Arquillian}} project.
+ {{{http://openejb.apache.org/}OpenEJB}} was suggested to me as well.
+
+ But I didn't want to test my entities inside a Java EE container--my
+ goal was not to test a Java EE solution.  I wanted to test them in a
+ POJO environment with as few layers as possible.
+
+ For that, I soon discovered this little fact in the JPA 2.0
+ specification:
+
+   [8.2.1.6.4] \[...\] A <<list of all named managed persistence
+   classes must be specified>> in Java SE environments to insure
+   portability. Portable Java SE applications should not rely on the
+   other mechanisms described here to specify the managed persistence
+   classes of a persistence unit. Persistence providers may require
+   that the set of entity classes and classes that are to be managed
+   must be fully enumerated in each of the persistence.xml files in
+   Java SE environments.
+
+ That means that in your <<<persistence.xml>>> you need a stanza like
+ this:
+
++---+
+  <class>com.mycompany.MyFirstEntity</class>
+  <class>com.mycompany.MySecondEntity</class>
+  <class>com.mycompany.MyThirdEntity</class>
+  <!-- ... etc. ... -->
+  <class>com.mycompany.MyNinetyThirdEntity</class>
++---+
+
+ But even that isn't enough, because it turns out that depending on
+ the vendor you also have to list all your mapped superclasses,
+ <<<@IdClass>>>-annotated classes and <<<@Embeddable>>>s.
+
+ Oh, and you have to make sure that all the classes contained in
+ dependent libraries that are embeddables, "id classes", entities or
+ mapped superclasses are also listed.
+
+* Annotation processor!
+
+ My first thought was to follow
+ {{{http://weblogs.java.net/blog/ss141213/archive/2007/11/a_javac_plugin_1.html}Sahoo's
+ lead}} and to either use his annotation processor or write one suited
+ to my needs.  The first problem I found was that an annotation
+ processor, unless it were very sophisticated, would not consider
+ entities from dependent libraries on the classpath.
+
+ In addition, in order to preserve vendor leniency, it is often
+ necessary to supply lots and lots of persistence properties in your
+ <<<persistence.xml>>> as well.  This one, for example:
+
++---+
+  <property name="hibernate.id.new_generator_mappings" value="true" />
++---+
+
+ An annotation processor that generated the whole
+ <<<persistence.xml>>> was not going to fit my needs.
+
+* Maven filtering
+
+ I began thinking about Maven filtering--the ability to have Maven
+ substitute text <<<${likeThis}>>> with equivalently named properties.
+ The {{{http://maven.apache.org/plugins/maven-resources-plugin/}Maven
+ resources plugin}}, I knew, has a
+ <<<{{{http://maven.apache.org/plugins/maven-resources-plugin/copy-resources-mojo.html}copy-resources}}>>>
+ goal that can take a <<<.properties>>> file as a
+ {{{http://maven.apache.org/plugins/maven-resources-plugin/copy-resources-mojo.html#filters}filter}}
+ source.  So it seemed that all I really had to do was come up with a
+ Maven plugin that would produce a <<<.properties>>> file whose
+ properties' values were lists of classes.
+
+* Exercises for the reader
+
+ This plugin does exactly that: it manages the production of a
+ <<<.properties>>> file whose properties' values are lists of class
+ names.  The names of the properties are customizable, as are the
+ prefixes and suffixes around each element of the classname.
+
+ Filtering itself is left to other members of the Maven ecosystem.  As
+ a hint, if you invoke the <<<resources:copy-resources>>> goal in the
+ right place, and specify the <<<.properties>>> file that <this>
+ plugin produces as one of its filters, then you can pull in the list
+ of classnames this plugin produces like this:
+
++---
+  <class>${entityClassnames}</class>
++---
