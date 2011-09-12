@@ -60,6 +60,101 @@ entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondE
  {{{http://maven.apache.org/guides/mini/guide-configuring-plugins.html}Guide
  to Configuring Plug-ins}} for more general information.
 
+*** Customizing what is scanned
+
+ By default, the <<<list-entity-classnames>>> goal scans the
+ {{{http://maven.apache.org/ref/3.0.3/maven-core/apidocs/org/apache/maven/project/MavenProject.html#getTestClasspathElements%28%29}test
+ classpath}}, which is normally that set up by the
+ {{{http://maven.apache.org/plugins/maven-surefire-plugin/examples/configuring-classpath.html}Maven
+ Surefire plugin}}.  This behavior can be customized by changing the
+ set of URLs that is scanned.
+
+ To change the set of URLs that is scanned, add a <<<<URLs>>>> element
+ to your configuration:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+      <configuration>
+        <URLs>
+          <URL>file:///foobar</URL>
+          <URL>file:${project.build.outputDirectory}</URL>
+        <URLs>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
++---
+
+ Remember that you can (and probably should) use Maven variables here
+ (like <<<${project.build.outputDirectory}>>> or
+ <<<${settings.localRepository}>>>).
+
+ Also, remember that dependent <<<.jar>>> files (dependency artifacts)
+ may contain some entities you need.  By default these <<<.jar>>>s are
+ included in the test classpath.
+
+ There is usually very little reason, if any, to customize the set of
+ URLs being scanned.
+
+*** Customizing how the scan takes place
+
+ The <<<jpa-maven-plugin>>> makes use of the
+ {{{http://scannotation.sourceforge.net/}Scannotation library}} to
+ locate classes that have certain annotations applied to them.  You
+ can customize the mechanism by which this scanning takes place by
+ specifying the implementation of the
+ <<<{{{../apidocs/com/edugility/jpa/maven/plugin/AnnotationDB.html}AnnotationDB}}>>>
+ instance that performs the scanning:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+      <configuration>
+        <db>
+          <ignoredPackages>
+            <ignoredPackage>junit</ignoredPackage>
+            <ignoredPackage>java</ignoredPackage>
+            <ignoredPackage>javax</ignoredPackage>
+            <ignoredPackage>org.apache.maven</ignoredPackage>
+            <ignoredPackage>org.apache.plexus</ignoredPackage>
+          </ignoredPackages>
+        </db>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
++---
+
+ This customization relies on the rather sophisticated configuration
+ mechanism brought to Maven by Plexus.  Specifically, when a plugin
+ parameter is an object, and not, say, a <<<String>>> or
+ <<<boolean>>>, you can specify the implementation you would like
+ Maven to use instead.  You can configure that implementation using
+ XML tags that represent its Java bean properties.  So in the above
+ example, we've caused the
+ <<<{{{http://scannotation.sourceforge.net/apidocs/org/scannotation/AnnotationDB.html#setIgnoredPackages%28java.lang.String[]%29}setIgnoredPackages}}>>>
+ method to be called on the <<<AnnotationDB>>> instance represented by
+ the <<<<db>>>> parameter.  It follows that you can customize any
+ public property of the <<<AnnotationDB>>> used to perform annotation
+ scanning.
+
 *** Customize the <<<.properties>>> file contents
 
 **** Changing the <<<defaultPropertyName>>>
@@ -243,7 +338,7 @@ And that's a wrap!'</lastItemSuffix>
 </plugin>
 +---
 
-This will produce:
+ This will produce:
 
 +---
 entityClassnames = Here are the properties! Property name\: com.foobar.simple.jpa.SimpleEntity\nProperty name \:com.edugility.simple.jpa.SimpleMappedSuperclass\nAnd that's a wrap!
@@ -255,3 +350,150 @@ entityClassnames = Here are the properties! Property name\: com.foobar.simple.jp
 
  In practice, you will rarely change any of these parameters--at least
  for JPA testing purposes.
+
+* Using the <<<.properties>>> file for Maven filtering
+
+** Create a <<<src/test/resources/META-INF/persistence.xml>>> file
+
+ Once you have a <<<.properties>>> file, the most productive thing to
+ do with it is to use it to fill out the persistent class list that
+ has to appear in your <<<META-INF/persistence.xml>>> file that you
+ use for testing.
+
+ First, create this file in your <<<src/test/resources>>> directory.
+ It should look something like this (modify what you need to; the
+ important part is the <<<${entityClassnames}>>> reference):
+
++---
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+             xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="test" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+    <class>${entityClassnames}</class>
+
+    <properties>
+      <property name="javax.persistence.jdbc.driver" value="${testDatabaseDriverClass}" />
+      <property name="javax.persistence.jdbc.url" value="${testDatabaseConnectionURL}" />
+      <property name="javax.persistence.jdbc.user" value="${testDatabaseUser}" />
+      <property name="javax.persistence.jdbc.password" value="${testDatabasePassword}" />
+
+      <property name="hibernate.default_schema" value="${testDatabaseSchema}" />
+      <property name="hibernate.id.new_generator_mappings" value="true"/>
+      <property name="hibernate.show_sql" value="${hibernateShowSql}" />
+      <property name="hibernate.format_sql" value="true" />
+    </properties>
+  </persistence-unit>
+</persistence>
++---
+
+ Please note that this is the <<<persistence.xml>>> file you'll use
+ for <testing>, not the one you'll distribute with your application.
+
+ If you were to run <<<mvn process-test-classes>>> at this point,
+ nothing very exciting would happen.  Your <<<.properties>>> file
+ would be generated, but it wouldn't be used in any way.
+
+ The Maven resource plugin's
+ <<<{{{http://maven.apache.org/plugins/maven-resources-plugin/resources-mojo.html}resources:resources}}>>>
+ goal needs to have all its filters present at the time it is invoked,
+ or it fails.  Since we can't even produce our <<<.properties>>> file
+ until at least the <<<process-test-classes>>> phase, we can't meet
+ this condition.  So filtering using the preconfigured project
+ resources is out of the question.
+
+ That's OK, though, because the Maven resources plugin also has a
+ <<<{{{http://maven.apache.org/plugins/maven-resources-plugin/copy-resources-mojo.html}copy-resources}}>>>
+ goal.  That goal is fully configurable.  So we will make use of it,
+ and invoke it after we've generated our <<<.properties>>> file.  Then
+ we'll set it up so that it copies and filters our
+ <<<META-INF/persistence.xml>>> file to where it should go, and it
+ will be as though our list of entity classnames was just another
+ Maven property that we used for filtering.
+
+ To start with, we need to exclude our test <<<persistence.xml>>> from
+ standard Maven resource copying.  Edit your <<<pom.xml>>> so that the
+ <<<<build>>>> section's <<<<testResources>>>> element looks like
+ this:
+
++---
+  <testResources>
+    <testResource>
+      <directory>src/test/resources</directory>
+      <filtering>true</filtering> <!-- if you want filtering on by default, obviously -->
+      <excludes>
+        <exclude>META-INF/persistence.xml</exclude>
+      </excludes>
+    </testResource>
+  </testResources>
++---
+
+ Next, we need to explicitly use the <<<maven-resources-plugin>>>, so
+ add a stanza for that in your <<<<build><plugins>>>> area:
+
++---
+  <build>
+    <plugins>
+
+      <!-- various plugins, including the jpa-maven-plugin -->
+
+      <!--
+           ORDER IS IMPORTANT! The jpa-maven-plugin must come before
+           the XML below.
+      -->
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>Copy persistence.xml filtered with generated entityClassnames.properties file</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <filters>
+                <filter>${project.build.directory}/generated-test-sources/jpa-maven-plugin/entityClassnames.properties</filter>
+              </filters>
+              <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
+              <resources>
+                <resource>
+                  <filtering>true</filtering>
+                  <directory>src/test/resources/META-INF</directory>
+                  <includes>
+                    <include>persistence.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
++---
+    
+ This bit of XML says that during the <<<process-test-classes>>>
+ phase, Maven should copy the
+ <<<src/test/resources/META-INF/persistence.xml>>> to
+ <<<target/test-classes/META-INF/persistence.xml>>> and should filter
+ it along the way with the contents of the
+ <<<entityClassnames.properties>>> file we just generated.
+
+ <<A note on plugin ordering:>> Maven plugins within the same phase
+ execute in the order that they are declared.  So because the
+ <<<maven-resources-plugin>>> goal we've configured above uses the
+ output of the <<<jpa-maven-plugin>>>'s <<<list-entity-classnames>>>
+ goal, the configuration stanzas for the <<<jpa-maven-plugin>>> must
+ appear first in your <<<pom.xml>>>.  Alternatively, we could have
+ configured the <<<copy-resources>>> goal to bind to the <<<test>>>
+ phase, but that might run <after> the
+ <<<maven-surefire-plugin>>>--which is going to run all our tests,
+ after all--during the <<<test>>> phase.  It's easier to put them both
+ into <<<test-classes>>> and just to ensure that they're in the right
+ order.
+

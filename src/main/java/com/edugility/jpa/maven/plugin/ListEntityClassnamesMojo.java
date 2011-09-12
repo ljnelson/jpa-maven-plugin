@@ -123,6 +123,12 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    */
   private static final Pattern quotePattern;
 
+  /**
+   * Static initializer; a workaround for <a
+   * href="http://jira.codehaus.org/browse/MODELLO-256">MODELLO-256</a>;
+   * initializes the {@link #quotePattern} field while avoiding {@link
+   * ExceptionInInitializerError}s.
+   */
   static {
     Pattern temp = null;
     try {

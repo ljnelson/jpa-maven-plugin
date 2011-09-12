@@ -151,7 +151,7 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
    * the {@link #setAnnotationDB(AnnotationDB)} method or the {@link
    * #createAnnotationDB()} method.
    *
-   * @parameter property="annotationDB"
+   * @parameter alias="db" property="annotationDB"
    *
    * @see #cloneAnnotationDB()
    *
