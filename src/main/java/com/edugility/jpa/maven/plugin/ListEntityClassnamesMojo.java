@@ -56,6 +56,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import javax.persistence.Embeddable; // for javadoc only
 import javax.persistence.Entity; // for javadoc only
 import javax.persistence.IdClass; // for javadoc only
@@ -107,6 +111,30 @@ import org.apache.maven.model.Build;
 public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
   /**
+   * A workaround for <a
+   * href="http://jira.codehaus.org/browse/MODELLO-256">MODELLO-256</a>;
+   * a {@link Pattern} used to strip initial leading and (matching)
+   * trailing quotes from a {@link String}.  Used indirectly by the
+   * {@link #setPrefix(String)}, {@link #setSuffix(String)}, {@link
+   * #setFirstItemPrefix(String)} and {@link
+   * #setLastItemSuffix(String)} methods.
+   *
+   * @see #stripQuotes(String)
+   */
+  private static final Pattern quotePattern;
+
+  static {
+    Pattern temp = null;
+    try {
+      temp = Pattern.compile("(?s)^(['\"])(.+)\\1$");
+    } catch (final PatternSyntaxException kaboom) {
+      kaboom.printStackTrace();
+    } finally {
+      quotePattern = temp;
+    }
+  }
+
+  /**
    * The property name to use for classnames that belong to the
    * default package when {@linkplain #getDefaultPropertyName()
    * another default property name} cannot be found.
@@ -151,6 +179,20 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * Persistence 2.0 Specification</a>
    */
   private static final List<String> JPA_ANNOTATIONS = Arrays.asList(Entity.class.getName(), MappedSuperclass.class.getName(), Embeddable.class.getName(), IdClass.class.getName());
+
+  /**
+   * A workaround for <a
+   * href="http://jira.codehaus.org/browse/MODELLO-256">MODELLO-256</a>;
+   * if {@code true} then values for the {@link #getPrefix() prefix},
+   * {@link #getSuffix() suffix}, {@link #getFirstItemPrefix()
+   * firstItemPrefix} and {@link #getLastItemSuffix() lastItemSuffix}
+   * will have any leading and trailing quotes (if they are a matched
+   * pair) removed.  This should protect these values from undesired
+   * trimming by Maven.
+   *
+   * @parameter default-value="true"
+   */
+  private boolean stripQuotes;
 
   /**
    * The character encoding to use when writing the {@link
@@ -251,7 +293,8 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * Creates a new {@link ListEntityClassnamesMojo}.
    */
   public ListEntityClassnamesMojo() {
-    super();    
+    super();
+    this.stripQuotes = true;
     this.setDefaultPropertyName(DEFAULT_DEFAULT_PROPERTY_NAME);
     this.setFirstItemPrefix("");
     this.setPrefix("");
@@ -292,6 +335,43 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
   }
 
   /**
+   * A workaround for <a
+   * href="http://jira.codehaus.org/browse/MODELLO-256">MODELLO-256</a>;
+   * strips leading and trailing quotes from the supplied {@code text}
+   * parameter value and returns the result.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * <p>This method only does something if the {@link #stripQuotes}
+   * field is set to {@code true}.</p>
+   *
+   * <p>This method is package-private for testing only.</p>
+   *
+   * @param text the text to strip; may be {@code null} in which case
+   * no substitution will occur
+   *
+   * @return the supplied {@code text} with leading and trailing
+   * quotes stripped, or {@code null} if the supplied {@code text} was
+   * {@code null}
+   *
+   * @see <a
+   * href="http://jira.codehaus.org/browse/MODELLO-256">MODELLO-256</a>
+   */
+  final String stripQuotes(String text) {
+    if (text != null && this.stripQuotes && quotePattern != null) {
+      final Matcher matcher = quotePattern.matcher(text);
+      assert matcher != null;
+      final StringBuffer sb = new StringBuffer();
+      while (matcher.find()) {
+        matcher.appendReplacement(sb, matcher.group(2));
+      }
+      matcher.appendTail(sb);
+      text = sb.toString();
+    }
+    return text;
+  }
+
+  /**
    * Returns the prefix prepended to every element of the list of
    * classnames, excluding the first element.
    *
@@ -317,7 +397,8 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * @see #setFirstItemPrefix(String)
    */
   public void setPrefix(final String prefix) {
-    this.prefix = prefix;
+    // See http://jira.codehaus.org/browse/MODELLO-256.
+    this.prefix = this.stripQuotes(prefix);
   }
 
   /**
@@ -347,7 +428,8 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * @see #setPrefix(String)
    */
   public void setFirstItemPrefix(final String firstItemPrefix) {
-    this.firstItemPrefix = firstItemPrefix;
+    // See http://jira.codehaus.org/browse/MODELLO-256.
+    this.firstItemPrefix = this.stripQuotes(firstItemPrefix);
   }
 
   /**
@@ -376,7 +458,8 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * @see #setLastItemSuffix(String)
    */
   public void setSuffix(final String suffix) {
-    this.suffix = suffix;
+    // See http://jira.codehaus.org/browse/MODELLO-256.
+    this.suffix = this.stripQuotes(suffix);
   }
 
   /**
@@ -406,7 +489,8 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * @see #setSuffix(String)
    */
   public void setLastItemSuffix(final String lastItemSuffix) {
-    this.lastItemSuffix = lastItemSuffix;
+    // See http://jira.codehaus.org/browse/MODELLO-256.
+    this.lastItemSuffix = this.stripQuotes(lastItemSuffix);
   }
 
   /**

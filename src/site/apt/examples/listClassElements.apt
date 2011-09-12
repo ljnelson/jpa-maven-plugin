@@ -1,0 +1,257 @@
+                                ------
+            Generating Elements in a <<<persistence.xml>>> File
+                                ------
+                             Laird Nelson
+                                ------
+                              2011-09-09
+                                ------
+
+Generating Elements in a <<<.persistence.xml>>> File
+
+* Summary
+
+ The <<<list-entity-classnames>>> goal generates a <<<.properties>>>
+ file in (usually)
+ <<<target/generated-test-sources/jpa-maven-plugin>>> named (usually)
+ <<<entityClassnames.properties>>>.  What you do with this file is up
+ to you.  This example shows the most common thing to do with this
+ file and is divided into two parts.
+
+ The first part shows the mechanics of generating the
+ <<<.properties>>> file.  The second part shows how one might make use
+ of this <<<.properties>>> file and Maven filtering.
+
+* Generating the <<<.properties>>> file
+
+** Generate the file using defaults
+
+ To use the defaults, which are sensible for most simple persistence
+ units, just do this:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
++---
+
+ This will generate an <<<entityClassnames.properties>>> file in
+ <<<${project.build.directory}/generated-test-sources/jpa-maven-plugin>>>
+ that looks something like this:
+
++---
+entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondEntity</class>\n<class>com.foobar.MyThirdEntity
++---
+
+** Customization
+
+ To customize this goal, make sure to supply a <<<<configuration>>>>
+ element in your <<<<execution>>>> element or directly beneath your
+ <<<<plugin>>>> element.  See the
+ {{{http://maven.apache.org/guides/mini/guide-configuring-plugins.html}Guide
+ to Configuring Plug-ins}} for more general information.
+
+*** Customize the <<<.properties>>> file contents
+
+**** Changing the <<<defaultPropertyName>>>
+
+ You can change the default property name:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+      <configuration>
+        <defaultPropertyName>allMyClasses</defaultPropertyName>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
++---
+
+ The <<<.properties>>> file contents would now look like this:
+
++---
+allMyClasses = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondEntity</class>\n<class>com.foobar.MyThirdEntity
++---
+
+**** Changing how packages are allocated to property names
+
+ In the case of multiple persistence units you might find that you
+ want certain classes listed under different persistence units.  To
+ accomplish this, your first step needs to be customizing the way that
+ auto-discovered persistent classes are allocated to property names.
+
+ By default, all classes are allocated to the property named by the
+ value of the
+ <<<{{{../list-entity-classnames-mojo.html#defaultPropertyName}defaultPropertyName}}>>>
+ parameter.  Technically, this value is the name of a property to use
+ when no other property name could be determined.
+
+ To do this property name allocation, you need to customize the
+ internal <<<Map>>> used to index property names by package
+ fragments.  Here, for example, is a configuration that uses package
+ fragments to list classes under different property keys.  The keys to
+ the map are <package fragments>, not simple strings.  That means that
+ <<<com.foobar>>> is a valid property key (assuming there is a
+ <<<com.foobar>>> package defined somewhere) but <<<com.foob>>> is not
+ (assuming that there is <not> a <<<com.foob>>> defined somewhere).
+
+ The search is carried out from most specific package fragment to most
+ general:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+      <configuration>
+        <defaultPropertyName>dumpingGroundClasses</defaultPropertyName>
+        <propertyNames>
+          <com.foobar.animal>animalClasses</com.foobar.animal>
+          <com.foobar.people>peopleClasses</com.foobar.people>
+          <com.foobar.vehicle>vehicleClasses</com.foobar.vehicle>
+          <com.foobar>generalClasses</com.foobar>
+          <com>otherClasses</com>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
++---
+
+ The <<<.properties>>> file contents would look something like this:
+
++---
+dumpingGroundClasses = Rock.class</class>\n<class>org.fugly.FuglyEntity
+
+animalClasses = com.foobar.animal.Chicken</class>\n<class>com.foobar.animal.Cow
+
+peopleClasses = com.foobar.people.Person
+
+vehicleClasses = com.foobar.vehicle.Truck</class>\n<class>com.foobar.vehicle.Car
+
+otherClasses = com.bizbaw.SomeEntity
++---
+
+**** Changing the prefix and suffix
+
+ You may have noticed the <<<<class>>>> and <<<</class>>>> fragments
+ decorating the property values.  These are the prefix and suffix used
+ to further add to the individual class names.  Obviously whether you
+ customize or eliminate these values depends on what you want to do
+ with the <<<.properties>>> file.  The defaults exist for the most
+ common case of wanting to use this goal in conjunction with a
+ <<<persistence.xml>>> file and Maven filtering (more on that later).
+
+ To change the prefix, provide the <<<<prefix>>>> parameter and the
+ <<<<suffix>>>> with a value:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+      <configuration>
+        <prefix>'Property name: '</prefix>
+        <suffix>'
+'</suffix>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
++---
+
+ The contents of the <<<.properties>>> file will now look (somewhat
+ uselessly) like this:
+
++---
+entityClassnames = com.foobar.simple.jpa.SimpleEntity\nProperty name \:com.edugility.simple.jpa.SimpleMappedSuperclass
++--- 
+
+ You may notice the single quotes (<<<'>>>) in the <<<<prefix>>>> and
+ <<<<suffix>>>> elements.  Due to
+ {{http://jira.codehaus.org/browse/MODELLO-256}}, leading and trailing
+ whitespace in Maven plugin configuration elements is ignored.
+
+ The <<<list-entity-classnames>>> goal works around this severe bug by
+ stripping (matching) leading quotation marks (single or double) that
+ occur as the first and last characters in the <<<<prefix>>>>,
+ <<<<suffix>>>>, <<<<firstItemPrefix>>>> and <<<<lastItemSuffix>>>>
+ elements.  This allows you to "protect" whitespace.  (Please note
+ that the usual standard mechanisms (<<<CDATA>>>, <<<xml:space>>>
+ attribute, etc.) do not work.)  If there are no such quotation marks,
+ or if the
+ <<<{{{./list-entity-classnames-mojo.html#stripQuotes}stripQuotes}}>>>
+ parameter is set to <<<false>>>, then no substitution is performed.
+
+**** Changing the first and last prefix and suffix elements
+
+ In the example above, the first element,
+ <<<com.foobar.simple.jpa.SimpleEntity>>>, does not have a prefix.
+ You can set this prefix as well, and you can set the last item's
+ suffix, too:
+
++---
+<plugin>
+  <groupId>com.edugility</groupId>
+  <artifactId>jpa-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <executions>
+    <execution>
+      <id>Generate entityClassnames.properties</id>
+      <goals>
+        <goal>list-entity-classnames</goal>
+      </goals>
+      <configuration>
+        <firstItemPrefix>'Here are the properties! Property name: '</firstItemPrefix>
+        <prefix>'Property name: '</prefix>
+        <suffix>'
+'</suffix>
+        <lastItemSuffix>'
+And that's a wrap!'</lastItemSuffix>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
++---
+
+This will produce:
+
++---
+entityClassnames = Here are the properties! Property name\: com.foobar.simple.jpa.SimpleEntity\nProperty name \:com.edugility.simple.jpa.SimpleMappedSuperclass\nAnd that's a wrap!
++--- 
+
+ As you might expect, the <<<firstItemPrefix>>> and
+ <<<lastItemSuffix>>> govern the "wrapper" prefix and suffix--the
+ textual decorations that are applied to the list as a whole.
+
+ In practice, you will rarely change any of these parameters--at least
+ for JPA testing purposes.

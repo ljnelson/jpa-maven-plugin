@@ -10,17 +10,13 @@ Usage
 
 * Summary
 
- The <<<jpa-maven-plugin>>> is a standard Maven plugin.  Currently
- there is only one goal: <<<list-entity-classnames>>>.  The
- <<<list-entity-classnames>>> goal binds by default to the
- <<<process-test-classes>>> phase.  Without any additional
- configuration, the plugin produces a file named
- <<<entityClassnames.properties>>> in the
- <<<target/generated-test-sources/jpa-maven-plugin>>> directory.
+ The <<<jpa-maven-plugin>>> is a standard Maven plugin that helps with
+ unit- and integration-testing JPA projects.  Install it and use it
+ like other standard Maven plugins.
 
 * Installation
 
- "Install" the plugin as you would any other Maven plugin.  In your
+ Install the plugin as you would any other Maven plugin.  In your
  <<<<build>>>>'s <<<<plugins>>>> stanza, include a <<<<plugin>>>>
  element referencing the <<<jpa-maven-plugin>>>:
 
@@ -29,46 +25,44 @@ Usage
     <groupId>com.edugility</groupId>
     <artifactId>jpa-maven-plugin</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <executions>
-      <execution>
-        <id>Generate properties file with entity classnames in it</id>
-        <goals>
-          <goal>list-entity-classnames</goal>
-        </goals>
-      </execution>
-    </executions>
+    <!-- ...more to come. -->
   </plugin>
 +---+
 
- This stanza sets up a single <<<execution>>> with an arbitrarily
- named <<<id>>> that says to run the <<<list-entity-classnames>>>
- goal during its default phase (<<<process-test-classes>>>).  All
- configuration elements are set to their default values by virtue of
- the fact they are not specified here.
+* Goal selection
 
-* Default configuration
+ Please see the {{{./plugin-info.html}Goals}} page for more
+ details on individual goals.
 
- You can use the plugin in this state.  By default it will:
+** <<<list-entity-classnames>>>
 
-  * Scan your test classpath
+ Produces a <<<.properties>>> file, usually named
+ <<<target/generated-test-sources/jpa-maven-plugin/entityClassnames.properties>>>,
+ that can be used as a filter to automatically supply the list of persistent class
+ names required by the JPA specification.
 
-  * Find all entities, mapped superclasses, id classes and embeddables
+ This goal binds by default to the <<<process-test-classes>>> phase.
 
-  * Create a <<<.properties>>> file named
-    <<<entityClassnames.properties>>> in the
-    <<<${project.build.directory}/generated-test-sources/jpa-maven-plugin>>>
-    directory
+ Here is an example of configuring the plugin to run this goal using
+ the defaults:
 
-  * Place a single property named <<<entityClassnames>>> in that file
-    whose value will be a list of the classnames it found.
++---
+   <plugin>
+     <groupId>com.edugility</groupId>
+     <artifactId>jpa-maven-plugin</artifactId>
+     <version>1.0-SNAPSHOT</version>
+     <executions>
+       <execution>
+         <id>Generate entityClassnames.properties during the process-test-classes phase</id>
+         <goals>
+           <goal>list-entity-classnames</goal>
+         </goals>
+       </execution>
+     </executions>
+   </plugin>
++---
 
-    * Each class name in the value will be prefixed with <<<<class>>>>
-      and suffixed with <<<</class>>>>, with the exception of the
-      first and last elements.
-
-    * The first element will be suffixed with <<<</class>>>>, but will
-      have no prefix.
-
-    * The last element will be prefixed with <<<<class>>>> but will
-      have no suffix.
-
+ You may bind this goal to another phase, but be aware that the goal
+ scans <class> information, not <source> information, so it needs to
+ be a goal that occurs after a compilation step.  In practice, there
+ is rarely a need to select a different phase.
