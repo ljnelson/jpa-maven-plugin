@@ -106,10 +106,11 @@ Rationale
  prefixes and suffixes around each element of the classname.
 
  Filtering itself is left to other members of the Maven ecosystem.  As
- a hint, if you invoke the <<<resources:copy-resources>>> goal in the
- right place, and specify the <<<.properties>>> file that <this>
- plugin produces as one of its filters, then you can pull in the list
- of classnames this plugin produces like this:
+ a {{{./examples/listClassElements.apt}hint}}, if you invoke the
+ <<<resources:copy-resources>>> goal in the right place, and specify
+ the <<<.properties>>> file that <this> plugin produces as one of its
+ filters, then you can pull in the list of classnames this plugin
+ produces like this:
 
 +---
   <class>${entityClassnames}</class>
