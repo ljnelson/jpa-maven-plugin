@@ -32,19 +32,49 @@ package com.edugility.jpa.maven.plugin.test.project;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
+import javax.persistence.Entity; // for javadoc only
 import javax.persistence.MappedSuperclass;
 
+/**
+ * A {@link MappedSuperclass @MappedSuperclass} for testing purposes.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 @Access(AccessType.FIELD)
 @MappedSuperclass
 public class SimpleMappedSuperclass {
 
+  /**
+   * The text of this {@link SimpleMappedSuperclass}.  This field
+   * exists so that {@link Entity @Entities} that inherit from this
+   * class will also inherit this column mapping.
+   *
+   * <p>This field may be {@code null} at any point.</p>
+   */
   @Column(name = "text")
   private String text;
 
+  /**
+   * Returns the text of this {@link SimpleMappedSuperclass}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the text of this {@link SimpleMappedSuperclass}, or
+   * {@code null}
+   */
   public String getText() {
     return this.text;
   }
 
+  /**
+   * Sets the text.
+   *
+   * @param text the new text value; may be {@code null}
+   */
   public void setText(final String text) {
     this.text = text;
   }

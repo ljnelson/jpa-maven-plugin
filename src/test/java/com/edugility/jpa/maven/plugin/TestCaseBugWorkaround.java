@@ -34,19 +34,50 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * A <a href="http://junit.org/">JUnit</a> test case to test the fix
+ * for <a
+ * href="http://jira.codehaus.org/browse/MODELLO-256">MODELLO-256</a>.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class TestCaseBugWorkaround {
 
-  private ListEntityClassnamesMojo mojo;
+  /**
+   * The {@link ListEntityClassnamesMojo} under test.  This field must
+   * never be {@code null} during a test run.
+   *
+   * @see #setUp()
+   */
+  protected ListEntityClassnamesMojo mojo;
 
+  /**
+   * Creates a new {@link TestCaseBugWorkaround} instance.
+   */
   public TestCaseBugWorkaround() {
     super();
   }
 
+  /**
+   * Runs before each test; sets the {@link #mojo} field to a new
+   * {@link ListEntityClassnamesMojo} instance.
+   *
+   * @see #mojo
+   *
+   * @see Before
+   */
   @Before
   public void setUp() {
     this.mojo = new ListEntityClassnamesMojo();
   }
 
+  /**
+   * Tests the "sunny day" scenario for the bug workaround.
+   */
   @Test
   public void testSunnyDayBugWorkaround() {
     final String text = "\"   foobar   \"";
@@ -55,6 +86,10 @@ public class TestCaseBugWorkaround {
     assertEquals(unquotedText, result);
   }
 
+  /**
+   * Tests that single quoting a space-bounded {@link String} will
+   * have its quotes stripped.
+   */
   @Test
   public void testSingleQuotes() {
     final String text = "'   foobar   '";
@@ -63,6 +98,9 @@ public class TestCaseBugWorkaround {
     assertEquals(unquotedText, result);
   }
 
+  /**
+   * Tests that mismatched quotes are not replaced.
+   */
   @Test
   public void testBugWorkaroundMismatchedQuotes() {
     final String text = "\"   foobar   '";
@@ -71,6 +109,12 @@ public class TestCaseBugWorkaround {
     assertEquals(unquotedText, result);
   }
 
+  /**
+   * Moves up an abstract layer and tests that the {@link
+   * ListEntityClassnamesMojo}'s {@link
+   * ListEntityClassnamesMojo#setSuffix(String) setSuffix(String)}
+   * method applies the bug workaround.
+   */
   @Test
   public void testSetSuffix() {
     final String suffix = "'  A test suffix      '";

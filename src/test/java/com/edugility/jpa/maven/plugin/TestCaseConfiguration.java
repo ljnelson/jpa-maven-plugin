@@ -51,10 +51,38 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * An {@link AbstractMojoTestCase} that ensures that configuration
+ * values as interpreted by Maven actually call the methods on an
+ * {@link ListEntityClassnamesMojo} instance as they should.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 public class TestCaseConfiguration extends AbstractMojoTestCase {
 
-  private ListEntityClassnamesMojo mojo;
+  /**
+   * The {@link ListEntityClassnamesMojo} under test.  This field must
+   * never be {@code null} during a test run.
+   *
+   * @see #setUp()
+   */
+  protected ListEntityClassnamesMojo mojo;
 
+  /**
+   * Loads up {@code
+   * ${project.build.testOutputDirectory}/test-project/pom.xml}, tells
+   * the Maven plugin testing harness to read it, and then gets the
+   * configured object from the harness and installs it as the value
+   * of the {@link #mojo} field.
+   *
+   * @exception Exception if an error occurs
+   *
+   * @see #mojo
+   */
   @Override
   public void setUp() throws Exception {
     super.setUp();
@@ -66,7 +94,15 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
     this.configureMojo(this.mojo, "jpa-maven-plugin", testPom);
   }
 
-  public File getBuildDirectory() {
+  /**
+   * Returns the best available value for the writable, transient
+   * directory where the current build is happening.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the build directory, never {@code null}
+   */
+  public final File getBuildDirectory() {
     return 
       new File(System.getProperty("maven.project.build.directory",
                                   System.getProperty("project.build.directory",
@@ -74,6 +110,14 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
                                                                    getBasedir(), File.separator))));
   }
 
+  /**
+   * Returns the best available value for the writable, transient
+   * directory where test classes are compiled to.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return the test output directory, never {@code null}
+   */
   public File getTestOutputDirectory() {
     return
       new File(System.getProperty("maven.project.build.testOutputDirectory",
@@ -82,6 +126,12 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
                                                                    getBasedir(), File.separator))));
   }
 
+  /**
+   * Ensures that Maven's configuration of the {@link #mojo} field's
+   * contents actually worked.
+   *
+   * @exception Exception if an error occurred
+   */
   public void testConfigurationWorked() throws Exception {
     final MavenProject project = this.mojo.getProject();
     assertNotNull(project);
@@ -131,6 +181,12 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
     assertTrue(db.getScanClassAnnotations());
   }
 
+  /**
+   * Runs the {@link ListEntityClassnamesMojo} goal on this project's
+   * test classes and verifies that the output is correct.
+   *
+   * @exception Exception if an error occurs
+   */
   public void testExecuteOnThisProjectsClasses() throws Exception {
     this.mojo.execute();
     final File propertiesFile = 
@@ -146,8 +202,23 @@ public class TestCaseConfiguration extends AbstractMojoTestCase {
     assertNotNull(properties.getProperty("edugilityClasses"));
   }
 
+  /**
+   * A {@link SystemStreamLog} that is enabled for debug logging.
+   *
+   * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+   *
+   * @version 1.0-SNAPSHOT
+   *
+   * @since 1.0-SNAPSHOT
+   */
   public static final class SystemStreamLogWithDebugEnabled extends SystemStreamLog {
     
+    /**
+     * Overrides the default behavior of this method to return {@code
+     * true} in all cases.
+     *
+     * @return {@code true}
+     */
     @Override
     public boolean isDebugEnabled() {
       return true;

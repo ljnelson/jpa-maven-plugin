@@ -36,24 +36,53 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/**
+ * A simple {@link Entity} for testing purposes.
+ *
+ * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
+ *
+ * @version 1.0-SNAPSHOT
+ *
+ * @since 1.0-SNAPSHOT
+ */
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "simple_entity")
 public class SimpleEntity extends SimpleMappedSuperclass {
 
+  /**
+   * The primary key ({@link Id @Id}) of this {@link SimpleEntity}.
+   *
+   * @see #SimpleEntity(long)
+   */
   @Column(name = "id")
   @Id
   private long id;
 
+  /**
+   * Creates a new {@link SimpleEntity}.
+   */
   protected SimpleEntity() {
     super();
   }
 
+  /**
+   * Creates a new {@link SimpleEntity}.
+   *
+   * @param id the value to use to uniquely identify the persistent
+   * state of this {@link SimpleEntity}
+   */
   public SimpleEntity(final long id) {
     this();
     this.id = id;
   }
   
+  /**
+   * Returns the {@link long} that identifies the persistent state of
+   * this {@link SimpleEntity}.
+   *
+   * @return the persistent identifier of this {@link SimpleEntity}
+   */
   public long getId() {
     return this.id;
   }

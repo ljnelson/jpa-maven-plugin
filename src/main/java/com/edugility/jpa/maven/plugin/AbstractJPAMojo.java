@@ -76,7 +76,9 @@ public abstract class AbstractJPAMojo extends AbstractMojo {
   /**
    * Static initializer; works around <a
    * href="http://sourceforge.net/tracker/?func=detail&aid=3134533&group_id=214374&atid=1029423">Scannotation
-   * bug #3134533</a>.
+   * bug #3134533</a> by installing a patched {@link
+   * FileProtocolIteratorFactory} into the {@link IteratorFactory}
+   * class&apos; {@link IteratorFactory#registry} field.
    *
    * @see <a
    * href="http://sourceforge.net/tracker/?func=detail&aid=3134533&group_id=214374&atid=1029423">Scannotation
