@@ -1,0 +1,56 @@
+-classpath
+'/Users/ljnelson/Projects/jpa-maven-plugin/target/classes:/Users/ljnelson/Projects/jpa-maven-plugin/target/test-classes:/Users/ljnelson/.m2/repository/log4j/log4j/1.2.12/log4j-1.2.12.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-core/3.0.3/maven-core-3.0.3.jar:/Users/ljnelson/.m2/repository/org/codehaus/plexus/plexus-container-default/1.5.1/plexus-container-default-1.5.1.jar:/Users/ljnelson/.m2/repository/org/codehaus/plexus/plexus-classworlds/2.4/plexus-classworlds-2.4.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-model-builder/3.0.3/maven-model-builder-3.0.3.jar:/Users/ljnelson/.m2/repository/org/sonatype/aether/aether-spi/1.11/aether-spi-1.11.jar:/Users/ljnelson/.m2/repository/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-compat/3.0-alpha-4/maven-compat-3.0-alpha-4.jar:/Users/ljnelson/.m2/repository/junit/junit/4.8.2/junit-4.8.2.jar:/Users/ljnelson/.m2/repository/org/eclipse/persistence/javax.persistence/2.0.3/javax.persistence-2.0.3.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-settings/3.0.3/maven-settings-3.0.3.jar:/Users/ljnelson/.m2/repository/org/sonatype/sisu/sisu-inject-bean/2.1.1/sisu-inject-bean-2.1.1.jar:/Users/ljnelson/.m2/repository/javassist/javassist/3.6.0.GA/javassist-3.6.0.GA.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-artifact/3.0.3/maven-artifact-3.0.3.jar:/Users/ljnelson/.m2/repository/org/scannotation/scannotation/1.0.2/scannotation-1.0.2.jar:/Users/ljnelson/.m2/repository/org/apache/maven/wagon/wagon-provider-api/1.0-beta-6/wagon-provider-api-1.0-beta-6.jar:/Users/ljnelson/.m2/repository/commons-logging/commons-logging-api/1.1/commons-logging-api-1.1.jar:/Users/ljnelson/.m2/repository/org/codehaus/plexus/plexus-utils/2.0.6/plexus-utils-2.0.6.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-model/3.0.3/maven-model-3.0.3.jar:/Users/ljnelson/.m2/repository/org/sonatype/aether/aether-impl/1.11/aether-impl-1.11.jar:/Users/ljnelson/.m2/repository/org/apache/xbean/xbean-reflect/3.4/xbean-reflect-3.4.jar:/Users/ljnelson/.m2/repository/org/sonatype/sisu/sisu-guice/2.9.4/sisu-guice-2.9.4-no_aop.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-aether-provider/3.0.3/maven-aether-provider-3.0.3.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-settings-builder/3.0.3/maven-settings-builder-3.0.3.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-repository-metadata/3.0.3/maven-repository-metadata-3.0.3.jar:/Users/ljnelson/.m2/repository/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar:/Users/ljnelson/.m2/repository/org/sonatype/aether/aether-api/1.11/aether-api-1.11.jar:/Users/ljnelson/.m2/repository/org/sonatype/aether/aether-util/1.11/aether-util-1.11.jar:/Users/ljnelson/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.14/plexus-interpolation-1.14.jar:/Users/ljnelson/.m2/repository/org/apache/maven/maven-plugin-api/3.0.3/maven-plugin-api-3.0.3.jar:/Users/ljnelson/.m2/repository/org/sonatype/sisu/sisu-inject-plexus/2.1.1/sisu-inject-plexus-2.1.1.jar:/Users/ljnelson/.m2/repository/org/codehaus/plexus/plexus-component-annotations/1.5.5/plexus-component-annotations-1.5.5.jar:/Users/ljnelson/.m2/repository/org/codehaus/plexus/plexus-archiver/1.0-alpha-7/plexus-archiver-1.0-alpha-7.jar:/Users/ljnelson/.m2/repository/org/apache/maven/plugin-testing/maven-plugin-testing-harness/2.0-alpha-1/maven-plugin-testing-harness-2.0-alpha-1.jar:/Users/ljnelson/.m2/repository/com/google/code/google-collections/google-collect/snapshot-20080530/google-collect-snapshot-20080530.jar'
+-encoding
+'UTF8'
+-private
+-sourcepath
+'/Users/ljnelson/Projects/jpa-maven-plugin/src/test/java'
+-author
+-bottom
+'Copyright &#169; 2011 <a href="http://about.me/lairdnelson">Laird Nelson</a>. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/ljnelson/Projects/jpa-maven-plugin/target/site/testapidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'JPA Maven Plugin 1.0-SNAPSHOT Test API'
+-link
+'http://download.oracle.com/javaee/6/api'
+-link
+'http://maven.apache.org/maven-plugin-api/apidocs'
+-link
+'http://maven.apache.org/maven-model/apidocs'
+-link
+'http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs'
+-link
+'http://plexus.codehaus.org/plexus-utils/apidocs'
+-link
+'http://scannotation.sourceforge.net/apidocs'
+-link
+'../apidocs'
+-linkoffline
+'http://download.oracle.com/javase/6/docs/api' '/Users/ljnelson/Projects/jpa-maven-plugin/target/javadoc-bundle-options'
+-sourcetab
+2
+-stylesheetfile
+'/Users/ljnelson/Projects/jpa-maven-plugin/target/site/testapidocs/stylesheet.css'
+-tag
+"description:t:Plugin Description:"
+-tag
+"goal:t:Goal:"
+-tag
+"parameter:fm:Plugin Parameter"
+-tag
+"phase:t:Runs by Default in Maven Lifecycle Phase:"
+-tag
+"readonly:fm:Read-Only Plugin Parameter"
+-tag
+"required:fm:Required Plugin Parameter"
+-tag
+"requiresDependencyResolution:t:Requires Dependency Resolution in Scope:"
+-use
+-version
+-windowtitle
+'JPA Maven Plugin 1.0-SNAPSHOT Test API'
