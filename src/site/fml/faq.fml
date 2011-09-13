@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (c) 2011 Edugility LLC.
+
+   Permission is hereby granted, free of charge, to any person
+   obtaining a copy of this software and associated documentation
+   files (the "Software"), to deal in the Software without
+   restriction, including without limitation the rights to use, copy,
+   modify, merge, publish, distribute, sublicense and/or sell copies
+   of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+   
+   The above copyright notice and this permission notice shall be
+   included in all copies or substantial portions of the Software.
+   
+   THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.
+
+   The original copy of this license is available at
+   http://www.opensource.org/license/mit-license.html.
+-->
+<faqs xmlns="http://maven.apache.org/FML/1.0.1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 
+                          http://maven.apache.org/xsd/fml-1.0.1.xsd"
+      id="FAQ" 
+      title="Frequently Asked Questions">
+  <part id="General">
+    <faq id="What does this plugin do?">
+      <question>What does this plugin do?</question>
+      <answer>
+        <p>The <tt>jpa-maven-plugin</tt> helps make unit and
+        integration testing of a JPA project easier.</p>
+      </answer>
+    </faq>
+    <faq id="What's so hard about JPA testing?">
+      <question>What's so hard about JPA testing?</question>
+      <answer>
+        <p>Nothing, if you don't mind editing your
+        <tt>persistence.xml</tt> in your
+        <tt>src/test/resources/META-INF</tt> directory--you do have
+        one, right?--every time you add or delete a new entity, mapped
+        superclass, id class or embeddable class.</p>
+      </answer>
+    </faq>
+    <faq id="Gee, that sounds like a lot of boilerplate.">
+      <question>Gee, that sounds like a lot of boilerplate.</question>
+      <answer>
+        <p>It is.</p>
+      </answer>
+    </faq>
+    <faq id="Why, almost of the kind that should be generated.">
+      <question>Why, almost of the kind that should be
+      generated.</question>
+      <answer>
+        <p>That's one of the things this plugin does: generate the
+        boilerplate list of class names in your test
+        <tt>persistence.xml</tt>.</p>
+      </answer>
+    </faq>
+    <faq id="So kind of like an annotation processor.">
+      <question>So kind of like an annotation processor.</question>
+      <answer>
+        <p>Yes, but an annotation processor at compile time inspects
+        source code.  This plugin inspects classes, and inspects the
+        classes of not only your project, but its test-time
+        dependencies.</p>
+      </answer>
+    </faq>
+    <faq id="That's a lot of class loading; isn't this thing slow?">
+      <question>That's a lot of class loading; isn't this thing slow?</question>
+      <answer>
+        <p>No, because it uses the <a
+        href="http://scannotation.sourceforge.net/">Scannotation</a>
+        library to inspect the bytecode of the classes very
+        quickly.</p>
+      </answer>
+    </faq>
+    <faq id="OK, how do I use it?">
+      <question>OK, how do I use it?</question>
+      <answer>
+        <p>Please see the <a
+        href="examples/listClassElements.html">&quot;Generating
+        elements in a persistence.xml file example&quot;</a> for an
+        example of its most common usage.  More detailed information
+        is available on the <a href="plugin-info.html">Goals</a>
+        page.</p>
+      </answer>
+    </faq>
+    <faq id="Does this plugin have anything to do with Hibernate?">
+      <question>Does this plugin have anything to do with Hibernate?</question>
+      <answer>
+        <p>No.  This plugin is JPA-provider agnostic.</p>
+      </answer>
+    </faq>
+    <faq id="Does this plugin interact with the database?">
+      <question>Does this plugin interact with the database?</question>
+      <answer>
+        <p>Not as of this writing.  Currently, none of this plugin's
+        goals interact with either the database or the JPA
+        provider.</p>
+      </answer>
+    </faq>
+  </part>
+</faqs>

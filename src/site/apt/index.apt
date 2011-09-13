@@ -70,7 +70,5 @@ JPA Maven Plugin
   To provide you with better understanding of some usages of the JPA
   Maven Plugin, you can take a look into the following examples: 
 
-  * {{{./examples/example-one.html}Example Description One}}
-
-  * {{{./examples/example-two.html}Example Description Two}}
-
+  * {{{./examples/listClassElements.html}Generating elements in a
+    persistence.xml file}}
