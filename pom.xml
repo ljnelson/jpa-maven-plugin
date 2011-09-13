@@ -16,6 +16,7 @@
   <name>JPA Maven Plugin</name>
   <description>JPA Maven Plugin</description>
   <inceptionYear>2011</inceptionYear>
+  <url>http://ljnelson.github.com/${project.artifactId}/</url>
 
   <organization>
     <name>Laird Nelson</name>
@@ -32,10 +33,10 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git@github.com:ljnelson/jpa-maven-plugin.git</connection>
-    <developerConnection>scm:git:https://ljnelson@github.com/ljnelson/jpa-maven-plugin.git</developerConnection>
+    <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
+    <developerConnection>scm:git:https://ljnelson@github.com/ljnelson/${project.artifactId}.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/ljnelson/jpa-maven-plugin/</url>
+    <url>https://github.com/ljnelson/${project.artifactId}/</url>
   </scm>
 
   <developers>
@@ -54,7 +55,7 @@
 
   <issueManagement>
     <system>Github</system>
-    <url>https://github.com/ljnelson/jpa-maven-plugin/issues</url>
+    <url>https://github.com/ljnelson/${project.artifactId}/issues</url>
   </issueManagement>
 
   <distributionManagement>
@@ -252,13 +253,13 @@
     <extensions>
       <extension>
         <groupId>org.apache.maven.scm</groupId>
-        <artifactId>maven-scm-provider-gitexe</artifactId>
-        <version>${mavenScmProviderGitexeVersion}</version>
+        <artifactId>maven-scm-manager-plexus</artifactId>
+        <version>${mavenScmManagerPlexusVersion}</version>
       </extension>
       <extension>
         <groupId>org.apache.maven.scm</groupId>
-        <artifactId>maven-scm-manager-plexus</artifactId>
-        <version>${mavenScmManagerPlexusVersion}</version>
+        <artifactId>maven-scm-provider-gitexe</artifactId>
+        <version>${mavenScmProviderGitexeVersion}</version>
       </extension>
       <extension>
         <groupId>org.kathrynhuxtable.maven.wagon</groupId>
@@ -308,9 +309,11 @@
     <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.9</mavenSurefirePluginVersion>
     <mavenVersion>3.0.3</mavenVersion>
-    <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
     <scannotationVersion>1.0.2</scannotationVersion>
     <wagonGitsiteVersion>0.4-SNAPSHOT</wagonGitsiteVersion>
+
+    <!-- Other properties -->
+    <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
 
   </properties>
 
