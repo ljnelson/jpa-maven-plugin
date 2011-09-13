@@ -7,6 +7,12 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <name>JPA Maven Plugin</name>
   <description>JPA Maven Plugin</description>
   <inceptionYear>2011</inceptionYear>
@@ -26,7 +32,7 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/ljnelson/jpa-maven-plugin.git</connection>
+    <connection>scm:git:git@github.com:ljnelson/jpa-maven-plugin.git</connection>
     <developerConnection>scm:git:https://ljnelson@github.com/ljnelson/jpa-maven-plugin.git</developerConnection>
     <tag>HEAD</tag>
     <url>https://github.com/ljnelson/jpa-maven-plugin/</url>
@@ -159,6 +165,16 @@
         </plugin>
 
         <plugin>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${mavenEnforcerPluginVersion}</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${mavenGpgPluginVersion}</version>
+        </plugin>
+
+        <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${mavenJarPluginVersion}</version>
         </plugin>
@@ -175,7 +191,12 @@
 
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.4</version>
+          <version>${mavenProjectInfoReportsPlugin}</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${mavenReleasePluginVersion}</version>
         </plugin>
 
         <plugin>
@@ -192,8 +213,18 @@
         </plugin>
 
         <plugin>
+          <artifactId>maven-scm-plugin</artifactId>
+          <version>${mavenScmPluginVersion}</version>
+        </plugin>
+
+        <plugin>
           <artifactId>maven-site-plugin</artifactId>
           <version>${mavenSitePluginVersion}</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${mavenSourcePluginVersion}</version>
         </plugin>
 
         <plugin>
@@ -236,12 +267,18 @@
     <mavenCleanPluginVersion>2.4.1</mavenCleanPluginVersion>
     <mavenCompilerPluginVersion>2.3.2</mavenCompilerPluginVersion>
     <mavenDependencyPluginVersion>2.2</mavenDependencyPluginVersion>
+    <mavenEnforcerPluginVersion>1.0.1</mavenEnforcerPluginVersion>
+    <mavenGpgPluginVersion>1.4</mavenGpgPluginVersion>
     <mavenJarPluginVersion>2.3.1</mavenJarPluginVersion>
     <mavenJavadocPluginVersion>2.8</mavenJavadocPluginVersion>
     <mavenPluginPluginVersion>2.9</mavenPluginPluginVersion>
     <mavenPluginTestingHarnessVersion>2.0-alpha-1</mavenPluginTestingHarnessVersion>
+    <mavenProjectInfoReportsPlugin>2.4</mavenProjectInfoReportsPlugin>
+    <mavenReleasePluginVersion>2.2.1</mavenReleasePluginVersion>    
     <mavenResourcesPluginVersion>2.5</mavenResourcesPluginVersion>
+    <mavenScmPluginVersion>1.5</mavenScmPluginVersion>
     <mavenSitePluginVersion>3.0</mavenSitePluginVersion>
+    <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.9</mavenSurefirePluginVersion>
     <mavenVersion>3.0.3</mavenVersion>
     <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
