@@ -57,6 +57,13 @@
     <url>https://github.com/ljnelson/jpa-maven-plugin/issues</url>
   </issueManagement>
 
+  <distributionManagement>
+    <site>
+      <id>Github project site</id>
+      <url>gitsite:git@github.com/ljnelson/${project.artifactId}.git</url>
+    </site>
+  </distributionManagement>
+
   <dependencyManagement>
     <dependencies>
 
@@ -241,6 +248,24 @@
 
       </plugins>
     </pluginManagement>
+
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.scm</groupId>
+        <artifactId>maven-scm-provider-gitexe</artifactId>
+        <version>${mavenScmProviderGitexeVersion}</version>
+      </extension>
+      <extension>
+        <groupId>org.apache.maven.scm</groupId>
+        <artifactId>maven-scm-manager-plexus</artifactId>
+        <version>${mavenScmManagerPlexusVersion}</version>
+      </extension>
+      <extension>
+        <groupId>org.kathrynhuxtable.maven.wagon</groupId>
+        <artifactId>wagon-gitsite</artifactId>
+        <version>${wagonGitsiteVersion}</version>
+      </extension>
+    </extensions>
     
     <resources>
       <resource>
@@ -276,13 +301,16 @@
     <mavenProjectInfoReportsPlugin>2.4</mavenProjectInfoReportsPlugin>
     <mavenReleasePluginVersion>2.2.1</mavenReleasePluginVersion>    
     <mavenResourcesPluginVersion>2.5</mavenResourcesPluginVersion>
+    <mavenScmManagerPlexusVersion>${mavenScmPluginVersion}</mavenScmManagerPlexusVersion>
     <mavenScmPluginVersion>1.5</mavenScmPluginVersion>
+    <mavenScmProviderGitexeVersion>${mavenScmPluginVersion}</mavenScmProviderGitexeVersion>
     <mavenSitePluginVersion>3.0</mavenSitePluginVersion>
     <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.9</mavenSurefirePluginVersion>
     <mavenVersion>3.0.3</mavenVersion>
     <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
     <scannotationVersion>1.0.2</scannotationVersion>
+    <wagonGitsiteVersion>0.4-SNAPSHOT</wagonGitsiteVersion>
 
   </properties>
 
