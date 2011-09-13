@@ -4,29 +4,114 @@ jpa-maven-plugin
 This project houses a [Maven plugin][1] for performing various tasks
 to help with JPA-based projects.
 
-In these early days the only mojo in here is the
-`ListEntityClassnamesMojo`.  It will help you with unit and
-integration testing.
+## Quick Start
 
-The `ListEntityClassnamesMojo` creates a properties file that can then
-be used as a Maven [filter][2] during unit testing (or for any other
-purpose).  It scans the test classpath (by default) looking for Java
-classes that have been annotated with either
-`javax.persistence.Entity`, `javax.persistence.MappedSuperclass` or
-`javax.persistence.IdClass`, and places their classnames in a
-properties file under a configurable property key (or several).  The
-classnames themselves may be prefixed and suffixed.
+Create a `persistence.xml` to be used for unit testing in
+`src/test/resources/META-INF`:
 
-The net effect is that you can do this inside your `persistence.xml`:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <persistence version="2.0"
+                 xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+      <persistence-unit name="test-Hibernate" transaction-type="RESOURCE_LOCAL">
 
-    <class>${entityClasses}</class>
-    
-...and if you've [set up your Maven filtering properly][2], you'll get
-something like this at test time:
+        <!-- This provider is just an example. -->
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
 
-    <class>com.foobar.FirstEntity</class>
-    <class>com.foobar.SecondEntity</class>
-    <class>com.foobar.dependency.SomeEntityFromADependencyJar</class>
+        <!-- This is where the magic will happen. -->
+        <class>${entityClassnames}</class>
+
+        <properties>
+          <property name="javax.persistence.jdbc.driver" value="TODO: JDBC driver class name goes here" />
+          <property name="javax.persistence.jdbc.url" value="TODO: JDBC connection URL for unit tests goes here" />
+          <property name="javax.persistence.jdbc.user" value="TODO: unit test database user goes here" />
+          <property name="javax.persistence.jdbc.password" value="TODO: unit test database password goes here" />
+
+          <!-- You may of course put any properties you want here -->
+          <property name="hibernate.default_schema" value="TODO: default test schema goes here" />
+          <property name="hibernate.id.new_generator_mappings" value="true"/>
+          <property name="hibernate.show_sql" value="true" />
+          <property name="hibernate.format_sql" value="true" />
+        </properties>
+      </persistence-unit>
+    </persistence>
+
+Ensure that it does _not_ get copied during resource copying.  Add
+this in your `pom.xml`'s `<build>` section:
+
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <excludes>
+          <exclude>META-INF/persistence.xml</exclude>
+        </excludes>
+        <!-- Whether you want to filter the other test resources is up to you -->
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
+Now set up the `jpa-maven-plugin`.  Place this in your `pom.xml`'s
+`<build>`'s `<plugins>` section:
+
+    <plugin>
+      <groupId>com.edugility</groupId>
+      <artifactId>jpa-maven-plugin</artifactId>
+      <version>1.0-SNAPSOT</version>
+      <executions>
+        <execution>
+          <id>Generate entityClassnames.properties</id>
+          <goals>
+            <goal>list-entity-classnames</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+
+Finally, make sure that the `persistence.xml` is copied over, but only
+after the `jpa-maven-plugin` has run.  Place this **IMMEDIATELY
+BELOW** the plugin stanza listed above:
+
+    <plugin>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>2.5</version>
+      <executions>
+        <execution>
+          <id>Copy persistence.xml filtered with generated entityClassnames.properties file</id>
+          <phase>process-test-classes</phase>
+          <goals>
+            <goal>copy-resources</goal>
+          </goals>
+          <configuration>
+            <filters>
+              <filter>${project.build.directory}/generated-test-sources/jpa-maven-plugin/entityClassnames.properties</filter>
+            </filters>
+            <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
+            <resources>
+              <resource>
+                <filtering>true</filtering>
+                <directory>src/test/resources/META-INF</directory>
+                <includes>
+                  <include>persistence.xml</include>
+                </includes>
+              </resource>
+            </resources>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+
+Run `mvn clean process-test-classes` if you just want to see the
+effects of the `jpa-maven-plugin`.  Look in your
+`target/test-classes/META-INF` directory.  You will see a
+`persistence.xml` file with all of your entity and mapped superclass
+and embeddables and id classes listed.
+
+## More Information
+
+For more information, grab the source to this project, and from the root directory run:
+
+    mvn clean install site
+
+Full documentation will be available at `target/site/index.html`.
 
 [1]: http://maven.apache.org/guides/plugin/guide-java-plugin-development.html
-[2]: http://maven.apache.org/plugins/maven-resources-plugin/copy-resources-mojo.html#filters
