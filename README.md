@@ -104,7 +104,9 @@ Run `mvn clean process-test-classes` if you just want to see the
 effects of the `jpa-maven-plugin`.  Look in your
 `target/test-classes/META-INF` directory.  You will see a
 `persistence.xml` file with all of your entity and mapped superclass
-and embeddables and id classes listed.
+and embeddables and id classes listed.  Any Maven lifecycle phases
+that occur before `process-test-classes` will not be able to use the
+effects of the `jpa-maven-plugin`.
 
 ## More Information
 
