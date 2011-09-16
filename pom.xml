@@ -34,8 +34,7 @@
 
   <scm>
     <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:https://ljnelson@github.com/ljnelson/${project.artifactId}.git</developerConnection>
-    <tag>HEAD</tag>
+    <developerConnection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</developerConnection>
     <url>https://github.com/ljnelson/${project.artifactId}/</url>
   </scm>
 
