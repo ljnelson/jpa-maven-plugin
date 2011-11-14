@@ -44,6 +44,14 @@ import java.io.File;
  */
 public class NotWritableDirectoryException extends DirectoryException {
 
+/**
+   * A serial version identifier uniquely identifying the version of
+   * this class.  See the <a
+   * href="http://download.oracle.com/javase/6/docs/api/java/io/Serializable.html">documentation
+   * for the {@code Serializable} class</a> for details.
+   */
+  private static final long serialVersionUID = 1L;
+
   /**
    * Creates a new {@link NotWritableDirectoryException}.
    *

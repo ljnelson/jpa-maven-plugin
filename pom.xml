@@ -144,9 +144,6 @@
           <version>${mavenCompilerPluginVersion}</version>
           <configuration>
             <compilerArgument>-Xlint:all</compilerArgument>
-            <encoding>UTF8</encoding>
-            <source>1.6</source>
-            <target>1.6</target>
           </configuration>
         </plugin>
 
@@ -189,6 +186,45 @@
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>${mavenJavadocPluginVersion}</version>
+          <configuration>
+            <tags>
+              <tag>
+                <name>description</name>
+                <placement>t</placement>
+                <head>Plugin Description:</head>
+              </tag>
+              <tag>
+                <name>goal</name>
+                <placement>t</placement>
+                <head>Goal:</head>
+              </tag>
+              <tag>
+                <name>parameter</name>
+                <placement>fm</placement>
+                <head>Plugin Parameter</head>
+              </tag>
+              <tag>
+                <name>phase</name>
+                <placement>t</placement>
+                <head>Runs by Default in Maven Lifecycle Phase:</head>
+              </tag>
+              <tag>
+                <name>readonly</name>
+                <placement>fm</placement>
+                <head>Read-Only Plugin Parameter</head>
+              </tag>
+              <tag>
+                <name>required</name>
+                <placement>fm</placement>
+                <head>Required Plugin Parameter</head>
+              </tag>
+              <tag>
+                <name>requiresDependencyResolution</name>
+                <placement>t</placement>
+                <head>Requires Dependency Resolution in Scope:</head>
+              </tag>
+            </tags>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -213,8 +249,6 @@
             <delimiters>
               <delimiter>${*}</delimiter>
             </delimiters>
-            <encoding>UTF8</encoding>
-            <escapeString>\</escapeString>
             <useDefaultDelimiters>false</useDefaultDelimiters>
           </configuration>
         </plugin>
@@ -242,7 +276,6 @@
               <maven.project.build.directory>${project.build.directory}</maven.project.build.directory>
               <maven.project.build.testOutputDirectory>${project.build.testOutputDirectory}</maven.project.build.testOutputDirectory>
             </systemPropertyVariables>
-            <useFile>false</useFile>
           </configuration>
         </plugin>
 
@@ -272,7 +305,7 @@
         <version>${wagonGitsiteVersion}</version>
       </extension>
     </extensions>
-    
+     
     <resources>
       <resource>
         <directory>${basedir}/src/main/resources</directory>
@@ -293,14 +326,14 @@
 
     <!-- Versions -->
     <javaxPersistenceVersion>2.0.3</javaxPersistenceVersion>
-    <junitVersion>4.8.2</junitVersion>
+    <junitVersion>4.10</junitVersion>
     <mavenAssemblyPluginVersion>2.2.1</mavenAssemblyPluginVersion>
     <mavenCleanPluginVersion>2.4.1</mavenCleanPluginVersion>
     <mavenCompilerPluginVersion>2.3.2</mavenCompilerPluginVersion>
-    <mavenDependencyPluginVersion>2.2</mavenDependencyPluginVersion>
+    <mavenDependencyPluginVersion>2.3</mavenDependencyPluginVersion>
     <mavenEnforcerPluginVersion>1.0.1</mavenEnforcerPluginVersion>
     <mavenGpgPluginVersion>1.4</mavenGpgPluginVersion>
-    <mavenJarPluginVersion>2.3.1</mavenJarPluginVersion>
+    <mavenJarPluginVersion>2.3.2</mavenJarPluginVersion>
     <mavenJavadocPluginVersion>2.8</mavenJavadocPluginVersion>
     <mavenPluginPluginVersion>2.9</mavenPluginPluginVersion>
     <mavenPluginTestingHarnessVersion>2.0-alpha-1</mavenPluginTestingHarnessVersion>
@@ -312,14 +345,38 @@
     <mavenScmProviderGitexeVersion>${mavenScmPluginVersion}</mavenScmProviderGitexeVersion>
     <mavenSitePluginVersion>3.0</mavenSitePluginVersion>
     <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
-    <mavenSurefirePluginVersion>2.9</mavenSurefirePluginVersion>
+    <mavenSurefirePluginVersion>2.10</mavenSurefirePluginVersion>
     <mavenVersion>3.0.3</mavenVersion>
     <scannotationVersion>1.0.2</scannotationVersion>
     <versionsMavenPluginVersion>1.2</versionsMavenPluginVersion>
     <wagonGitsiteVersion>0.4-SNAPSHOT</wagonGitsiteVersion>
 
+    <!-- maven-compiler-plugin properties -->
+    <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.verbose>true</maven.compiler.verbose>
+
+    <!-- maven-javadoc-plugin properties -->
+    <detectLinks>false</detectLinks>
+    <links>http://download.oracle.com/javaee/6/api/,http://maven.apache.org/maven-plugin-api/apidocs/,http://maven.apache.org/maven-model/apidocs/,http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/,http://plexus.codehaus.org/plexus-utils/apidocs/,http://scannotation.sourceforge.net/apidocs/</links>
+    <show>private</show>
+    <sourcetab>2</sourcetab>
+    <stylesheet>maven</stylesheet>
+
+    <!-- maven-resource-plugin properties -->
+    <maven.resource.escapeString>\</maven.resource.escapeString>
+
+    <!-- maven-site-plugin properties -->
+    <maven.site.deploy.skip>true</maven.site.deploy.skip>
+
+    <!-- maven-surefire-plugin properties -->
+    <surefire.useFile>false</surefire.useFile>
+
     <!-- Other properties -->
     <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF8</project.reporting.outputEncoding>
 
   </properties>
 
@@ -333,18 +390,6 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>${mavenJavadocPluginVersion}</version>
         <configuration>
-          <detectLinks>false</detectLinks>
-          <links>
-            <link>http://download.oracle.com/javaee/6/api/</link>
-            <link>http://maven.apache.org/maven-plugin-api/apidocs/</link>
-            <link>http://maven.apache.org/maven-model/apidocs/</link>
-            <link>http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/</link>
-            <link>http://plexus.codehaus.org/plexus-utils/apidocs/</link>
-            <link>http://scannotation.sourceforge.net/apidocs/</link>
-          </links>
-          <show>private</show>
-          <sourcetab>2</sourcetab>
-          <stylesheet>maven</stylesheet>
           <tags>
             <tag>
               <name>description</name>

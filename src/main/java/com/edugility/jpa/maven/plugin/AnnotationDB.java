@@ -48,6 +48,14 @@ import java.util.Set;
 public class AnnotationDB extends org.scannotation.AnnotationDB implements Cloneable {
   
   /**
+   * A serial version identifier uniquely identifying the version of
+   * this class.  See the <a
+   * href="http://download.oracle.com/javase/6/docs/api/java/io/Serializable.html">documentation
+   * for the {@code Serializable} class</a> for details.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Creates a new {@link AnnotationDB}.
    */
   public AnnotationDB() {
@@ -94,7 +102,7 @@ public class AnnotationDB extends org.scannotation.AnnotationDB implements Clone
       this.setScanParameterAnnotations(db.getScanParameterAnnotations());
       this.setScanFieldAnnotations(db.getScanFieldAnnotations());
       
-      this.setIgnoredPackages((String[])db.getIgnoredPackages().clone());
+      this.setIgnoredPackages(db.getIgnoredPackages().clone());
     }
   }
 
