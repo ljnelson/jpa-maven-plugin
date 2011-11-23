@@ -369,7 +369,7 @@
     <maven.resource.escapeString>\</maven.resource.escapeString>
 
     <!-- maven-site-plugin properties -->
-    <maven.site.deploy.skip>true</maven.site.deploy.skip>
+    <maven.site.deploy.skip>false</maven.site.deploy.skip>
 
     <!-- maven-surefire-plugin properties -->
     <surefire.useFile>false</surefire.useFile>
