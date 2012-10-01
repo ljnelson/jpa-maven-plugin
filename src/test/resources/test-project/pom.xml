@@ -162,6 +162,7 @@
           </propertyNames>
           <suffix implementation="java.lang.String"><![CDATA[</class>
 ]]></suffix>
+          <useOutputFile>true</useOutputFile>
         </configuration>
       </plugin>
     </plugins>

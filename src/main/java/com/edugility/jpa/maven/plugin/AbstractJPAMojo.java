@@ -67,8 +67,6 @@ import org.scannotation.archiveiterator.StreamIterator;
  *
  * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
  *
- * @version 1.0-SNAPSHOT
- *
  * @since 1.0-SNAPSHOT
  */
 public abstract class AbstractJPAMojo extends AbstractMojo {

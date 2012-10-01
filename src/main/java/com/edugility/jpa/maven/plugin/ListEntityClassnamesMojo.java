@@ -88,8 +88,6 @@ import org.apache.maven.model.Build;
  *
  * @author <a href="mailto:ljnelson@gmail.com">Laird Nelson</a>
  *
- * @version 1.0-SNAPSHOT
- *
  * @since 1.0-SNAPSHOT
  *
  * @requiresDependencyResolution test
@@ -149,7 +147,9 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
   /**
    * The default {@linkplain File#getName() name} used in constructing
-   * the {@link #outputFile} when no output file has been specified.
+   * the {@link #outputFile} when no output file has been specified
+   * and the return value of the {@link #getUseOutputFile()} method is
+   * {@code true}.
    */
   private static final String DEFAULT_OUTPUT_FILENAME = String.format("%s.properties", DEFAULT_DEFAULT_PROPERTY_NAME);
 
@@ -222,6 +222,13 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * property="outputFile"
    */
   private File outputFile;
+
+  /**
+   * Whether or not to write properties to an external file.
+   *
+   * @parameter default-value="true" property="useOutputFile"
+   */
+  boolean useOutputFile;
 
   /**
    * The property key under which the entity classname listing will be
@@ -816,7 +823,9 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
   private final void initialize() throws DependencyResolutionRequiredException, FileException {
     this.initializePropertyNames();
     this.initializeURLs();
-    this.initializeOutputFile();
+    if (this.getUseOutputFile()) {
+      this.initializeOutputFile();
+    }
   }
 
   /**
@@ -903,6 +912,32 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
   }
 
   /**
+   * Returns whether or not this {@link ListEntityClassnamesMojo}
+   * should write its properties out to the associated {@link
+   * #getOutputFile() output file}.  By default this method returns
+   * {@code true} for backwards compatibility.
+   *
+   * @return whether or not this {@link ListEntityClassnamesMojo}
+   * should write its properties out to the associated {@link
+   * #getOutputFile() output file}
+   */
+  public boolean getUseOutputFile() {
+    return this.useOutputFile;
+  }
+
+  /**
+   * Sets whether or not this {@link ListEntityClassnamesMojo} should
+   * write its properties out to the associated {@linkplain
+   * #getOutputFile() output file}.
+   *
+   * @param useOutputFile whether or not to use the associated
+   * {@linkplain #getOutputFile() output file}
+   */
+  public void setUseOutputFile(final boolean useOutputFile) {
+    this.useOutputFile = useOutputFile;
+  }
+
+  /**
    * Returns the {@link Set} of {@link URL}s to scan for annotations.
    * This method does not perform any validation or initialization.
    *
@@ -966,7 +1001,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
     } catch (final DependencyResolutionRequiredException kaboom) {
       throw new MojoExecutionException(String.format("Dependencies of the current Maven project could not be downloaded during initialization of the jpa-maven-plugin."), kaboom);
     } catch (final NotWritableDirectoryException kaboom) {
-      throw new MojoExecutionException(String.format("The output directory path, %s, exists and is a directory, but Maven running as %s cannot write to it.", kaboom.getFile(), System.getProperty("user.name")), kaboom);
+      throw new MojoExecutionException(String.format("The output directory path, %s, exists and is a directory, but the current user, %s, cannot write to it.", kaboom.getFile(), System.getProperty("user.name")), kaboom);
     } catch (final NotWritableFileException kaboom) {
       throw new MojoExecutionException(String.format("The outputFile specified, %s, is a regular file, but cannot be written to by Maven running as user %s.  The outputFile parameter must designate either an existing, writable file or a non-existent file.", outputFile, System.getProperty("user.name")), kaboom);
     } catch (final NotNormalFileException kaboom) {
@@ -978,14 +1013,6 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
     } catch (final FileException other) {
       throw new MojoExecutionException("An unexpected FileException occurred during initialization.", other);
     }
-
-    final File outputFile = this.getOutputFile();
-    assert outputFile != null;
-    assert outputFile.exists() ? outputFile.isFile() : true;
-    assert outputFile.getParentFile() != null;
-    assert outputFile.getParentFile().isDirectory();
-    assert outputFile.getParentFile().canWrite();
-    assert !outputFile.exists() ? outputFile.getParentFile().canWrite() : true;
 
     // Scan the test classpath for Entity, MappedSuperclass, IdClass,
     // Embeddable, etc. annotations.
@@ -1124,38 +1151,65 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       }
     }
 
-    // Prepare to write.  Get the character encoding, accounting for
-    // possible null return values from an overridden getEncoding()
-    // method.
-    String encoding = this.getEncoding();
-    if (encoding == null) {
-      encoding = "";
-    } else {
-      encoding = encoding.trim();
-    }
-    if (encoding.isEmpty()) {
-      encoding = "UTF8";
-    }
-    
-    // Set up the Writer to point to the outputFile and have the
-    // Properties store itself there.
-    Writer writer = null;
-    try {
-      writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encoding));
-      properties.store(writer, "Generated by " + this.getClass().getName());
-      writer.flush();
-    } catch (final IOException kaboom) {
-      throw new MojoExecutionException(String.format("While attempting to write to the outputFile parameter (%s), an IOException was encountered.", outputFile), kaboom);
-    } finally {
-      if (writer != null) {
-        try {
-          writer.close();
-        } catch (final IOException ignore) {
-          // ignored on purpose
+    final MavenProject project = this.getProject();
+    if (project != null) {
+      final Properties projectProperties = project.getProperties();
+      if (projectProperties != null) {
+        @SuppressWarnings("unchecked")
+        final Enumeration<String> propertyNames = (Enumeration<String>)properties.propertyNames();
+        if (propertyNames != null && propertyNames.hasMoreElements()) {
+          while (propertyNames.hasMoreElements()) {
+            final String propertyName = propertyNames.nextElement();
+            if (propertyName != null) {
+              projectProperties.setProperty(propertyName, properties.getProperty(propertyName));
+            }
+          }
         }
       }
     }
+    
+    if (this.getUseOutputFile()) {
+      final File outputFile = this.getOutputFile();
+      if (outputFile != null) {
+        assert outputFile.exists() ? outputFile.isFile() : true;
+        assert outputFile.getParentFile() != null;
+        assert outputFile.getParentFile().isDirectory();
+        assert outputFile.getParentFile().canWrite();
+        assert !outputFile.exists() ? outputFile.getParentFile().canWrite() : true;
 
+        // Prepare to write.  Get the character encoding, accounting for
+        // possible null return values from an overridden getEncoding()
+        // method.
+        String encoding = this.getEncoding();
+        if (encoding == null) {
+          encoding = "";
+        } else {
+          encoding = encoding.trim();
+        }
+        if (encoding.isEmpty()) {
+          encoding = "UTF8";
+        }
+
+        // Set up the Writer to point to the outputFile and have the
+        // Properties store itself there.
+        Writer writer = null;
+        try {
+          writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encoding));
+          properties.store(writer, "Generated by " + this.getClass().getName());
+          writer.flush();
+        } catch (final IOException kaboom) {
+          throw new MojoExecutionException(String.format("While attempting to write to the outputFile parameter (%s), an IOException was encountered.", outputFile), kaboom);
+        } finally {
+          if (writer != null) {
+            try {
+              writer.close();
+            } catch (final IOException ignore) {
+              // ignored on purpose
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -1210,10 +1264,11 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
         final Log log = this.getLog();
         assert log != null;
         
+        // Find the class' package name.  Extract "com.foobar" from
+        // "com.foobar.Foo".
         final int index = Math.max(0, className.lastIndexOf('.'));
         String packageName = className.substring(0, index);
         assert packageName != null;
-        
         if (log.isDebugEnabled()) {
           log.debug("Package: " + packageName);
         }
