@@ -8,7 +8,7 @@
 
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>2</version>
+  <version>3-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <parent>
