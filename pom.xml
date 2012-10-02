@@ -336,7 +336,7 @@
     <mavenResourcesPluginVersion>2.6</mavenResourcesPluginVersion>
     <mavenScmManagerPlexusVersion>${mavenScmPluginVersion}</mavenScmManagerPlexusVersion>
     <mavenScmPluginVersion>1.6</mavenScmPluginVersion>
-    <mavenSitePluginVersion>3.0</mavenSitePluginVersion>
+    <mavenSitePluginVersion>3.1</mavenSitePluginVersion>
     <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.12.3</mavenSurefirePluginVersion>
     <scannotationVersion>1.0.2</scannotationVersion>

@@ -10,12 +10,19 @@ Generating Elements in a <<<.persistence.xml>>> File
 
 * Summary
 
- The <<<list-entity-classnames>>> goal generates a <<<.properties>>>
- file in (usually)
+ The <<<list-entity-classnames>>> goal scans the test classpath,
+ looking for JPA entities, mapped superclasses, embeddables and id
+ classes.  When it finds them, it installs the list of their names
+ under one or more property names that are then available throughout
+ the rest of the Maven build for filtering.  The value of these
+ properties is customizable and may be formatted in various ways.
+
+ Additionally, the <<<list-entity-classnames>>> goal can generate a
+ <<<.properties>>> file in (usually)
  <<<target/generated-test-sources/jpa-maven-plugin>>> named (usually)
- <<<entityClassnames.properties>>>.  What you do with this file is up
- to you.  This example shows the most common thing to do with this
- file and is divided into two parts.
+ <<<entityClassnames.properties>>> containing these properties.  What
+ you do with this file is up to you.  This example shows the most
+ common thing to do with this file and is divided into two parts.
 
  The first part shows the mechanics of generating the
  <<<.properties>>> file.  The second part shows how one might make use
@@ -32,7 +39,7 @@ Generating Elements in a <<<.persistence.xml>>> File
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>
@@ -45,7 +52,7 @@ Generating Elements in a <<<.persistence.xml>>> File
 +---
 
  This will generate an <<<entityClassnames.properties>>> file in
- <<<${project.build.directory}/generated-test-sources/jpa-maven-plugin>>>
+ <<<$\{project.build.directory}/generated-test-sources/jpa-maven-plugin>>>
  that looks something like this:
 
 +---
@@ -86,7 +93,7 @@ entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondE
       <configuration>
         <URLs>
           <URL>file:///foobar</URL>
-          <URL>file:${project.build.outputDirectory}</URL>
+          <URL>file:\${project.build.outputDirectory}</URL>
         <URLs>
       </configuration>
     </execution>
@@ -95,8 +102,8 @@ entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondE
 +---
 
  Remember that you can (and probably should) use Maven variables here
- (like <<<${project.build.outputDirectory}>>> or
- <<<${settings.localRepository}>>>).
+ (like <<<$\{project.build.outputDirectory}>>> or
+ <<<$\{settings.localRepository}>>>).
 
  Also, remember that dependent <<<.jar>>> files (dependency artifacts)
  may contain some entities you need.  By default these <<<.jar>>>s are
@@ -362,7 +369,7 @@ entityClassnames = Here are the properties! Property name\: com.foobar.simple.jp
 
  First, create this file in your <<<src/test/resources>>> directory.
  It should look something like this (modify what you need to; the
- important part is the <<<${entityClassnames}>>> reference):
+ important part is the <<<$\{entityClassnames}>>> reference):
 
 +---
 <?xml version="1.0" encoding="UTF-8"?>
@@ -456,9 +463,9 @@ entityClassnames = Here are the properties! Property name\: com.foobar.simple.jp
             </goals>
             <configuration>
               <filters>
-                <filter>${project.build.directory}/generated-test-sources/jpa-maven-plugin/entityClassnames.properties</filter>
+                <filter>\${project.build.directory}/generated-test-sources/jpa-maven-plugin/entityClassnames.properties</filter>
               </filters>
-              <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
+              <outputDirectory>\${project.build.testOutputDirectory}/META-INF</outputDirectory>
               <resources>
                 <resource>
                   <filtering>true</filtering>
