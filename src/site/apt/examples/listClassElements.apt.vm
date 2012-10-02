@@ -6,7 +6,7 @@
                               2011-09-09
                                 ------
 
-Generating Elements in a <<<.persistence.xml>>> File
+Generating Elements in a <<<persistence.xml>>> File
 
 * Summary
 
@@ -83,7 +83,7 @@ entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondE
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>
@@ -126,7 +126,7 @@ entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondE
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>
@@ -172,7 +172,7 @@ entityClassnames = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondE
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>
@@ -222,7 +222,7 @@ allMyClasses = com.foobar.MyFirstEntity</class>\n<class>com.foobar.MySecondEntit
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>
@@ -274,7 +274,7 @@ otherClasses = com.bizbaw.SomeEntity
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>
@@ -325,7 +325,7 @@ entityClassnames = com.foobar.simple.jpa.SimpleEntity\nProperty name \:com.edugi
 <plugin>
   <groupId>com.edugility</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${project.version}</version>
   <executions>
     <execution>
       <id>Generate entityClassnames.properties</id>

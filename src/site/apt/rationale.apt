@@ -88,7 +88,7 @@ Rationale
 * Maven filtering
 
  I began thinking about Maven filtering--the ability to have Maven
- substitute text <<<${likeThis}>>> with equivalently named properties.
+ substitute text <<<$\{likeThis}>>> with equivalently named properties.
  The {{{http://maven.apache.org/plugins/maven-resources-plugin/}Maven
  resources plugin}}, I knew, has a
  <<<{{{http://maven.apache.org/plugins/maven-resources-plugin/copy-resources-mojo.html}copy-resources}}>>>
@@ -97,6 +97,14 @@ Rationale
  source.  So it seemed that all I really had to do was come up with a
  Maven plugin that would produce a <<<.properties>>> file whose
  properties' values were lists of classes.
+
+ ({{{https://github.com/ljnelson/jpa-maven-plugin/issues/3}Issue #3}}
+ provided the impetus to actually make this list of properties
+ available to the rest of the build as well, and with its resolution
+ you can now skip the <<<.properties>>> file altogether if you so
+ desire, although in that case you have to figure out where in the
+ Maven lifecycle you would like this plugin to fire, which is not an
+ easy question to answer.)
 
 * Exercises for the reader
 
