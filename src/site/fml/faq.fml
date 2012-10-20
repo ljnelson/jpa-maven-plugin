@@ -44,8 +44,8 @@
       <answer>
         <p>Nothing, if you don't mind editing your
         <tt>persistence.xml</tt> in your
-        <tt>src/test/resources/META-INF</tt> directory--you do have
-        one, right?--every time you add or delete a new entity, mapped
+        <tt>src/test/resources/META-INF</tt> directory (you do have
+        one, right?) every time you add or delete a new entity, mapped
         superclass, id class or embeddable class.</p>
       </answer>
     </faq>

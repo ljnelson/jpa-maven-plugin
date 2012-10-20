@@ -133,6 +133,16 @@
       <plugins>
 
         <plugin>
+          <groupId>com.github.github</groupId>
+          <artifactId>site-maven-plugin</artifactId>
+          <version>${siteMavenPluginVersion}</version>
+          <configuration>
+            <message>Building site for ${project.artifactId} ${project.version}</message>
+            <server>github</server>
+          </configuration>
+        </plugin>
+
+        <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>${mavenAssemblyPluginVersion}</version>
         </plugin>
@@ -296,6 +306,21 @@
       </plugins>
     </pluginManagement>
 
+    <plugins>
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>site</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
     <resources>
       <resource>
         <directory>${basedir}/src/main/resources</directory>
@@ -340,6 +365,7 @@
     <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.12.3</mavenSurefirePluginVersion>
     <scannotationVersion>1.0.2</scannotationVersion>
+    <siteMavenPluginVersion>0.7</siteMavenPluginVersion>
     <versionsMavenPluginVersion>1.3.1</versionsMavenPluginVersion>
 
     <!-- maven-compiler-plugin properties -->
