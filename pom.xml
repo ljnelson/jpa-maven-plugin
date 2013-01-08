@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <prerequisites>
-    <maven>3.0.3</maven>
+    <maven>3.0.4</maven>
   </prerequisites>
 
   <groupId>com.edugility</groupId>
@@ -342,38 +342,38 @@
     <!-- Versions -->
     <findbugsMavenPluginVersion>2.5.2</findbugsMavenPluginVersion>
     <javaxPersistenceVersion>2.0.3</javaxPersistenceVersion>
-    <junitVersion>4.10</junitVersion>
-    <mavenAssemblyPluginVersion>2.3</mavenAssemblyPluginVersion>
-    <mavenCleanPluginVersion>2.4.1</mavenCleanPluginVersion>
-    <mavenCompilerPluginVersion>2.5.1</mavenCompilerPluginVersion>
+    <junitVersion>4.11</junitVersion>
+    <mavenAssemblyPluginVersion>2.4</mavenAssemblyPluginVersion>
+    <mavenCleanPluginVersion>2.5</mavenCleanPluginVersion>
+    <mavenCompilerPluginVersion>3.0</mavenCompilerPluginVersion>
     <mavenCoreVersion>3.0.4</mavenCoreVersion>
-    <mavenDependencyPluginVersion>2.4</mavenDependencyPluginVersion>
+    <mavenDependencyPluginVersion>2.6</mavenDependencyPluginVersion>
     <mavenDeployPluginVersion>2.7</mavenDeployPluginVersion>
-    <mavenEnforcerPluginVersion>1.1.1</mavenEnforcerPluginVersion>
+    <mavenEnforcerPluginVersion>1.2</mavenEnforcerPluginVersion>
     <mavenGpgPluginVersion>1.4</mavenGpgPluginVersion>
-    <mavenInstallPluginVersion>2.3.1</mavenInstallPluginVersion>
+    <mavenInstallPluginVersion>2.4</mavenInstallPluginVersion>
     <mavenJarPluginVersion>2.4</mavenJarPluginVersion>
     <mavenJavadocPluginVersion>2.9</mavenJavadocPluginVersion>
-    <mavenPluginPluginVersion>2.9</mavenPluginPluginVersion>
+    <mavenPluginPluginVersion>3.2</mavenPluginPluginVersion>
     <mavenPluginTestingHarnessVersion>2.0</mavenPluginTestingHarnessVersion>
-    <mavenProjectInfoReportsPlugin>2.5.1</mavenProjectInfoReportsPlugin>
-    <mavenReleasePluginVersion>2.2.2</mavenReleasePluginVersion>    
+    <mavenProjectInfoReportsPlugin>2.6</mavenProjectInfoReportsPlugin>
+    <mavenReleasePluginVersion>2.4</mavenReleasePluginVersion>    
     <mavenResourcesPluginVersion>2.6</mavenResourcesPluginVersion>
     <mavenScmManagerPlexusVersion>${mavenScmPluginVersion}</mavenScmManagerPlexusVersion>
-    <mavenScmPluginVersion>1.6</mavenScmPluginVersion>
-    <mavenSitePluginVersion>3.1</mavenSitePluginVersion>
-    <mavenSourcePluginVersion>2.1.2</mavenSourcePluginVersion>
-    <mavenSurefirePluginVersion>2.12.3</mavenSurefirePluginVersion>
+    <mavenScmPluginVersion>1.8.1</mavenScmPluginVersion>
+    <mavenSitePluginVersion>3.2</mavenSitePluginVersion>
+    <mavenSourcePluginVersion>2.2.1</mavenSourcePluginVersion>
+    <mavenSurefirePluginVersion>2.13</mavenSurefirePluginVersion>
     <scannotationVersion>1.0.2</scannotationVersion>
     <siteMavenPluginVersion>0.7</siteMavenPluginVersion>
-    <versionsMavenPluginVersion>1.3.1</versionsMavenPluginVersion>
+    <versionsMavenPluginVersion>2.0</versionsMavenPluginVersion>
 
     <!-- maven-compiler-plugin properties -->
     <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
-    <maven.compiler.verbose>true</maven.compiler.verbose>
+    <maven.compiler.verbose>false</maven.compiler.verbose>
 
     <!-- maven-javadoc-plugin properties -->
     <detectLinks>false</detectLinks>
