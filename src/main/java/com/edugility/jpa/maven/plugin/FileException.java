@@ -47,6 +47,14 @@ import java.io.IOException;
 public abstract class FileException extends IOException {
 
   /**
+   * The version of this class for {@linkplain Serializable
+   * serialization purposes}.
+   *
+   * @since 3-SNAPSHOT
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * The {@link File} that failed validation.  This field may be
    * {@code null}.
    */

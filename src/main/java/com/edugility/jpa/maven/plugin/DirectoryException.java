@@ -46,6 +46,14 @@ import java.io.File;
 public abstract class DirectoryException extends FileException {
 
   /**
+   * The version of this class for {@linkplain Serializable
+   * serialization purposes}.
+   *
+   * @since 3-SNAPSHOT
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Creates a new {@link DirectoryException}.
    *
    * @param directory the {@link File} whose validation failure caused

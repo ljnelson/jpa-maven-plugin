@@ -95,6 +95,18 @@
         <groupId>net.sf.scannotation</groupId>
         <artifactId>scannotation</artifactId>
         <version>${scannotationVersion}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>3.18.2-GA</version>
       </dependency>
 
     </dependencies>
@@ -124,6 +136,11 @@
     <dependency>
       <groupId>net.sf.scannotation</groupId>
       <artifactId>scannotation</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
     </dependency>
 
   </dependencies>
