@@ -358,7 +358,7 @@
 
     <!-- Versions -->
     <findbugsMavenPluginVersion>2.5.2</findbugsMavenPluginVersion>
-    <javaxPersistenceVersion>2.0.3</javaxPersistenceVersion>
+    <javaxPersistenceVersion>2.0.5</javaxPersistenceVersion>
     <junitVersion>4.11</junitVersion>
     <mavenAssemblyPluginVersion>2.4</mavenAssemblyPluginVersion>
     <mavenCleanPluginVersion>2.5</mavenCleanPluginVersion>
