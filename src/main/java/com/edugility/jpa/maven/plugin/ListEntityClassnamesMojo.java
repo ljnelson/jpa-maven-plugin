@@ -520,7 +520,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    */
   private final Set<URL> initializeURLs() throws DependencyResolutionRequiredException {
     Set<URL> urls = this.getURLs();
-    if (urls == null) {
+    if (urls == null || urls.isEmpty()) {
       urls = this.getTestClasspathURLs();
     }
     assert urls != null;
