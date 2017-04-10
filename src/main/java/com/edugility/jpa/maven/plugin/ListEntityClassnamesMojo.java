@@ -1299,7 +1299,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       }
     }
     if (propertyName == null) {
-      propertyName = DEFAULT_DEFAULT_PROPERTY_NAME;
+      propertyName = this.getDefaultPropertyName();
     }
     return propertyName;
   }
