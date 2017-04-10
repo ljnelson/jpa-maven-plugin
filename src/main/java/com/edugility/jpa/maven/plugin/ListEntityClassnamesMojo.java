@@ -1257,12 +1257,12 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * <p>Otherwise, a property name is 
    */
   public String determinePropertyName(String className) {
+    final Log log = this.getLog();
+    assert log != null;
     String propertyName = this.getDefaultPropertyName();
     if (className != null) {
       className = className.trim();
       if (!className.isEmpty()) {
-        final Log log = this.getLog();
-        assert log != null;
         
         // Find the class' package name.  Extract "com.foobar" from
         // "com.foobar.Foo".
@@ -1293,13 +1293,16 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
             propertyName = propertyNames.get(packageName);
           }
         }
-        if (log.isDebugEnabled()) {
-          log.debug("propertyName: " + propertyName);
-        }
       }
     }
     if (propertyName == null) {
-      propertyName = DEFAULT_DEFAULT_PROPERTY_NAME;
+      propertyName = this.getDefaultPropertyName();
+      if (propertyName == null) {
+        propertyName = DEFAULT_DEFAULT_PROPERTY_NAME;
+      }
+    }
+    if (log.isDebugEnabled()) {
+      log.debug("propertyName: " + propertyName);
     }
     return propertyName;
   }
