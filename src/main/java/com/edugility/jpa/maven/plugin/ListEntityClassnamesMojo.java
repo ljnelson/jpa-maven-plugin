@@ -94,7 +94,7 @@ import org.apache.maven.model.Build;
  *
  * @goal list-entity-classnames
  *
- * @phase process-test-classes
+ * @phase process-classes
  *
  * @see AbstractJPAMojo
  *
@@ -163,7 +163,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * <p>This field is package-private for unit testing purposes
    * only.</p>
    */
-  static final String DEFAULT_SUBDIR_PREFIX = String.format("generated-test-sources%1$sjpa-maven-plugin", File.separator);
+  static final String DEFAULT_SUBDIR_PREFIX = String.format("generated-sources%1$sjpa-maven-plugin", File.separator);
 
   /**
    * The {@link List} of <a
@@ -215,10 +215,10 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * classnames will be written.  This field may be {@code null} at
    * any point.  If this {@link File} is found to be relative, it will
    * be relative to
-   * <tt>${project.build.directory}${file.separator}generated-test-sources${file.separator}jpa-maven-plugin${file.separator}</tt>.
+   * <tt>${project.build.directory}${file.separator}generated-sources${file.separator}jpa-maven-plugin${file.separator}</tt>.
    *
    * @parameter
-   * default-value="${project.build.directory}${file.separator}generated-test-sources${file.separator}jpa-maven-plugin${file.separator}entityClassnames.properties"
+   * default-value="${project.build.directory}${file.separator}generated-sources${file.separator}jpa-maven-plugin${file.separator}entityClassnames.properties"
    * property="outputFile"
    */
   private File outputFile;
@@ -296,7 +296,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
 
   /**
    * The {@link Set} of {@link URL}s to scan.  If not explicitly
-   * specified, this mojo will scan the test classpath.
+   * specified, this mojo will scan the compile classpath.
    * 
    * @parameter property="URLs"
    */
@@ -521,7 +521,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
   private final Set<URL> initializeURLs() throws DependencyResolutionRequiredException {
     Set<URL> urls = this.getURLs();
     if (urls == null || urls.isEmpty()) {
-      urls = this.getTestClasspathURLs();
+      urls = this.getClasspathURLs();
     }
     assert urls != null;
     final URLFilter urlFilter = this.getURLFilter();
@@ -538,12 +538,12 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
   }
 
   /**
-   * Returns a {@link Set} of {@link URL}s that represents the test
+   * Returns a {@link Set} of {@link URL}s that represents the compile
    * classpath.
    *
    * <p>This uses the {@linkplain #getProject() associated
    * <tt>MavenProject</tt>} to {@linkplain
-   * MavenProject#getTestClasspathElements() supply the information}.
+   * MavenProject#getCompileClasspathElements() supply the information}.
    * If that {@link MavenProject} is {@code null}, then an {@linkplain
    * Collection#isEmpty() empty} {@linkplain
    * Collections#unmodifiableSet(Set) unmodifiable <tt>Set</tt>} is
@@ -554,7 +554,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    *
    * <ul>
    *
-   * <li>The {@link MavenProject#getTestClasspathElements()} method
+   * <li>The {@link MavenProject#getCompileClasspathElements()} method
    * returns an untyped {@link List}.  There is no contractual
    * guarantee about the type of its contents.  Each element is
    * therefore treated as an {@link Object}.</li>
@@ -573,17 +573,17 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    *
    * <p>This method never returns {@code null}.</p>
    *
-   * @return a {@link Set} of {@link URL}s representing the test
+   * @return a {@link Set} of {@link URL}s representing the compile
    * classpath, never {@code null}.  The {@link Set}'s iteration order
    * is guaranteed to be equal to that of the iteration order of the
    * return value of the {@link
-   * MavenProject#getTestClasspathElements()} method.
+   * MavenProject#getCompileClasspathElements()} method.
    *
    * @exception DependencyResolutionRequiredException if the {@link
-   * MavenProject#getTestClasspathElements()} method throws a {@link
+   * MavenProject#getCompileClasspathElements()} method throws a {@link
    * DependencyResolutionRequiredException}
    */
-  private final Set<URL> getTestClasspathURLs() throws DependencyResolutionRequiredException {
+  private final Set<URL> getClasspathURLs() throws DependencyResolutionRequiredException {
     final Set<URL> urls;
 
     final Log log = this.getLog();
@@ -594,12 +594,12 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
     if (project == null) {
       classpathElements = null;
     } else {
-      classpathElements = project.getTestClasspathElements();
+      classpathElements = project.getCompileClasspathElements();
     }
 
     if (classpathElements == null || classpathElements.isEmpty()) {
       if (log.isWarnEnabled()) {
-        log.warn(String.format("The test classpath contained no elements. Consequently no Entities were found."));
+        log.warn(String.format("The compile classpath contained no elements. Consequently no Entities were found."));
       }
       urls = Collections.emptySet();
     } else {
@@ -614,7 +614,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
               throw (InternalError)new InternalError(String.format("While attempting to convert a file, %s, into a URL, a MalformedURLException was encountered.", file)).initCause(wontHappen);
             }
           } else if (log.isWarnEnabled()) {
-            log.warn(String.format("The test classpath element %s could not be read.", file));
+            log.warn(String.format("The compile classpath element %s could not be read.", file));
           }
         }
       }
@@ -625,7 +625,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       }
     }
     if (log.isWarnEnabled() && urls.isEmpty()) {
-      log.warn(String.format("No URLs were found from the test classpath (%s).", classpathElements));
+      log.warn(String.format("No URLs were found from the compile classpath (%s).", classpathElements));
     }
     return urls;
   }
@@ -716,7 +716,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
    * <p>If the supplied {@link File} is a relative {@link File}, then
    * it will be made absolute by prepending it with the following
    * platform-neutral path: <tt>${{@link Build#getDirectory()
-   * project.build.directory}}/generated-test-sources/jpa-maven-plugin/</tt></p>
+   * project.build.directory}}/generated-sources/jpa-maven-plugin/</tt></p>
    *
    * @param outputFile the {@link File} to validate
    *
@@ -1014,7 +1014,7 @@ public class ListEntityClassnamesMojo extends AbstractJPAMojo {
       throw new MojoExecutionException("An unexpected FileException occurred during initialization.", other);
     }
 
-    // Scan the test classpath for Entity, MappedSuperclass, IdClass,
+    // Scan the compile classpath for Entity, MappedSuperclass, IdClass,
     // Embeddable, etc. annotations.
     final AnnotationDB db;
     AnnotationDB tempDb = null;

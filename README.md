@@ -8,14 +8,14 @@ to help with JPA-based projects.
 
 ## Quick Start
 
-Create a `persistence.xml` to be used for unit testing in
-`src/test/resources/META-INF`:
+You should have a `persistence.xml` to be used for in
+`src/main/resources/META-INF`:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <persistence version="2.0"
                  xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-      <persistence-unit name="test-Hibernate" transaction-type="RESOURCE_LOCAL">
+      <persistence-unit name="hibernate" transaction-type="RESOURCE_LOCAL">
 
         <!-- This provider is just an example. -->
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
@@ -25,12 +25,12 @@ Create a `persistence.xml` to be used for unit testing in
 
         <properties>
           <property name="javax.persistence.jdbc.driver" value="TODO: JDBC driver class name goes here" />
-          <property name="javax.persistence.jdbc.url" value="TODO: JDBC connection URL for unit tests goes here" />
-          <property name="javax.persistence.jdbc.user" value="TODO: unit test database user goes here" />
-          <property name="javax.persistence.jdbc.password" value="TODO: unit test database password goes here" />
+          <property name="javax.persistence.jdbc.url" value="TODO: JDBC connection URL goes here" />
+          <property name="javax.persistence.jdbc.user" value="TODO: database user goes here" />
+          <property name="javax.persistence.jdbc.password" value="TODO: database password goes here" />
 
           <!-- You may of course put any properties you want here -->
-          <property name="hibernate.default_schema" value="TODO: default test schema goes here" />
+          <property name="hibernate.default_schema" value="TODO: default schema goes here" />
           <property name="hibernate.id.new_generator_mappings" value="true"/>
           <property name="hibernate.show_sql" value="true" />
           <property name="hibernate.format_sql" value="true" />
@@ -41,16 +41,16 @@ Create a `persistence.xml` to be used for unit testing in
 Ensure that it does _not_ get copied during resource copying.  Add
 this in your `pom.xml`'s `<build>` section:
 
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
+    <resources>
+      <resources>
+        <directory>src/resources</directory>
         <excludes>
           <exclude>META-INF/persistence.xml</exclude>
         </excludes>
-        <!-- Whether you want to filter the other test resources is up to you -->
+        <!-- Whether you want to filter the other resources is up to you -->
         <filtering>true</filtering>
-      </testResource>
-    </testResources>
+      </resources>
+    </resources>
 
 Now set up the `jpa-maven-plugin`.  Place this in your `pom.xml`'s
 `<build>`'s `<plugins>` section:
@@ -58,7 +58,7 @@ Now set up the `jpa-maven-plugin`.  Place this in your `pom.xml`'s
     <plugin>
       <groupId>com.edugility</groupId>
       <artifactId>jpa-maven-plugin</artifactId>
-      <version>3-SNAPSHOT</version>
+      <version>4-SNAPSHOT</version>
       <executions>
         <execution>
           <id>Generate entityClassnames.properties</id>
@@ -79,19 +79,19 @@ BELOW** the plugin stanza listed above:
       <executions>
         <execution>
           <id>Copy persistence.xml filtered with generated entityClassnames.properties file</id>
-          <phase>process-test-classes</phase>
+          <phase>process-classes</phase>
           <goals>
             <goal>copy-resources</goal>
           </goals>
           <configuration>
             <filters>
-              <filter>${project.build.directory}/generated-test-sources/jpa-maven-plugin/entityClassnames.properties</filter>
+              <filter>${project.build.directory}/generated-sources/jpa-maven-plugin/entityClassnames.properties</filter>
             </filters>
-            <outputDirectory>${project.build.testOutputDirectory}/META-INF</outputDirectory>
+            <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
             <resources>
               <resource>
                 <filtering>true</filtering>
-                <directory>src/test/resources/META-INF</directory>
+                <directory>src/main/resources/META-INF</directory>
                 <includes>
                   <include>persistence.xml</include>
                 </includes>
@@ -102,12 +102,12 @@ BELOW** the plugin stanza listed above:
       </executions>
     </plugin>
 
-Run `mvn clean process-test-classes` if you just want to see the
-effects of the `jpa-maven-plugin`.  Look in your
-`target/test-classes/META-INF` directory.  You will see a
+Run `mvn clean process-classes` if you just want to see the
+effects of the `jpa-maven-plugin` or `mvn clean package` to use it in your build.  Look in your
+`target/classes/META-INF` directory.  You will see a
 `persistence.xml` file with all of your entity and mapped superclass
 and embeddables and id classes listed.  Any Maven lifecycle phases
-that occur before `process-test-classes` will not be able to use the
+that occur before `process-classes` will not be able to use the
 effects of the `jpa-maven-plugin`.
 
 ## More Information

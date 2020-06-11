@@ -175,7 +175,7 @@ public class TestCaseFileHandling {
     final File outputFile = this.mojo.initializeOutputFile(boozle);
     assertNotNull(outputFile);
     outputFile.deleteOnExit();
-    assertEquals(buildDirectory.getPath() + File.separator + "generated-test-sources" + File.separator + "jpa-maven-plugin", outputFile.getParent());
+    assertEquals(buildDirectory.getPath() + File.separator + "generated-sources" + File.separator + "jpa-maven-plugin", outputFile.getParent());
   }
 
 }

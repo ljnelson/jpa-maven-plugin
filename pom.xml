@@ -6,9 +6,9 @@
     <maven>3.0.4</maven>
   </prerequisites>
 
-  <groupId>com.edugility</groupId>
+  <groupId>com.github.iSnow</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>3-SNAPSHOT</version>
+  <version>4-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <parent>
@@ -106,7 +106,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.27.0-GA</version>
+        <version>${javassistVersion}</version>
       </dependency>
 
     </dependencies>
@@ -382,6 +382,7 @@
     <mavenSourcePluginVersion>2.2.1</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.13</mavenSurefirePluginVersion>
     <scannotationVersion>1.0.3</scannotationVersion>
+    <javassistVersion>3.27.0-GA</javassistVersion>
     <siteMavenPluginVersion>0.9</siteMavenPluginVersion>
     <versionsMavenPluginVersion>2.0</versionsMavenPluginVersion>
 
