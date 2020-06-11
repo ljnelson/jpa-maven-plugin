@@ -8,6 +8,13 @@ to help with JPA-based projects.
 
 ## Quick Start
 
+## Compile and install the plugin
+
+Sorry about that, but the plugin is not on central. To build and use it locally, type `mvn install` in the terminal.
+The plugin will be installed into your .m2/repository and be available for local builds. CI pipelines will not like this.
+
+## Use in projects
+
 You should have a `persistence.xml` to be used for in
 `src/main/resources/META-INF`:
 
