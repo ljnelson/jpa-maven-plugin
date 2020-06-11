@@ -1,7 +1,7 @@
 jpa-maven-plugin
 ================
 
-[![Jitpack Snapshots](https://jitpack.io/v/iSnow/jpa-maven-plugin/2b8d2659ce.svg)](https://jitpack.io/#iSnow/jpa-maven-plugin/2b8d2659ce)
+[![Jitpack Snapshots](https://jitpack.io/v/iSnow/jpa-maven-plugin.svg)](https://jitpack.io/#iSnow/jpa-maven-plugin)
 
 This project houses a [Maven plugin][1] for performing various tasks
 to help with JPA-based projects.
