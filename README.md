@@ -58,7 +58,7 @@ Now set up the `jpa-maven-plugin`.  Place this in your `pom.xml`'s
     <plugin>
       <groupId>com.edugility</groupId>
       <artifactId>jpa-maven-plugin</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>3-SNAPSHOT</version>
       <executions>
         <execution>
           <id>Generate entityClassnames.properties</id>
