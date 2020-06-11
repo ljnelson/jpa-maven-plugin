@@ -3,8 +3,9 @@ jpa-maven-plugin
 
 [![Jitpack Snapshots](https://jitpack.io/v/iSnow/jpa-maven-plugin.svg)](https://jitpack.io/#iSnow/jpa-maven-plugin)
 
-This project houses a [Maven plugin][1] for performing various tasks
-to help with JPA-based projects.
+This project houses a [Maven plugin][1] for auto-discovering JAP-annotated entity classes from libraries. The
+primary use-case is developers who factor out model classes into a library and need JPA providers like Eclipselink
+to see them. Spring developers do not need this plugin, neither do Hibernate developers.
 
 ## Quick Start
 
