@@ -7,6 +7,9 @@ This project houses a [Maven plugin][1] for auto-discovering JAP-annotated entit
 primary use-case is developers who factor out model classes into a library and need JPA providers like Eclipselink
 to see them. Spring developers do not need this plugin, neither do Hibernate developers.
 
+If you use this from IntelliJ, you need to add a Maven goal `mvn package` to the "before launch" section
+of your run configuration.
+
 ## Quick Start
 
 ## Compile and install the plugin
