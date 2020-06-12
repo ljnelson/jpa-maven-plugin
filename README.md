@@ -66,19 +66,21 @@ this in your `pom.xml`'s `<build>` section:
 Now set up the `jpa-maven-plugin`.  Place this in your `pom.xml`'s
 `<build>`'s `<plugins>` section:
 
-    <plugin>
-      <groupId>com.edugility</groupId>
-      <artifactId>jpa-maven-plugin</artifactId>
-      <version>4-SNAPSHOT</version>
-      <executions>
-        <execution>
-          <id>Generate entityClassnames.properties</id>
-          <goals>
-            <goal>list-entity-classnames</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
+```
+<plugin>
+   <groupId>com.github.iSnow</groupId>
+   <artifactId>jpa-maven-plugin</artifactId>
+   <version>4-SNAPSHOT</version>
+   <executions>
+       <execution>
+           <id>Generate entityClassnames.properties</id>
+           <goals>
+               <goal>list-entity-classnames</goal>
+           </goals>
+       </execution>
+   </executions>
+</plugin>
+```
 
 Finally, make sure that the `persistence.xml` is copied over, but only
 after the `jpa-maven-plugin` has run.  Place this **IMMEDIATELY
