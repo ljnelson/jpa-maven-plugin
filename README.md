@@ -10,6 +10,9 @@ to see them. Spring developers do not need this plugin, neither do Hibernate dev
 If you use this from IntelliJ, you need to add a Maven goal `mvn package` to the "before launch" section
 of your run configuration.
 
+## TODO
+- two or more persistance units
+
 ## Quick Start
 
 ## Compile and install the plugin
