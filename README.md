@@ -17,6 +17,15 @@ of your run configuration.
 
 ### From Jitpack
 
+To use it from Jitpack, you need to add Jitpack as a repository location to your pom.xml:
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
 Look up the latest commit hash on [Jitpack](https://jitpack.io/#iSnow/jpa-maven-plugin) and include it in your pom.xml (replacing 7d6cbfc42f with the actual hash):
 
     <plugin>
@@ -35,7 +44,7 @@ Look up the latest commit hash on [Jitpack](https://jitpack.io/#iSnow/jpa-maven-
 
 ### Compile and install the plugin
 
-Sorry about that, but the plugin is not on central. To build and use it locally, type `mvn install` in the terminal.
+The plugin is not on central, so if you don't want to use Jitpack, you must build it yourself. To build and use it locally, type `mvn install` in the terminal.
 The plugin will be installed into your .m2/repository and be available for local builds. CI pipelines will not like this.
 
 ### Use in projects
