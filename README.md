@@ -17,12 +17,12 @@ of your run configuration.
 
 ### From Jitpack
 
-Look up the latest commit hash on [Jitpack](https://jitpack.io/#iSnow/jpa-maven-plugin) and include it in your pom.xml:
+Look up the latest commit hash on [Jitpack](https://jitpack.io/#iSnow/jpa-maven-plugin) and include it in your pom.xml (replacing 7d6cbfc42f with the actual hash):
 
     <plugin>
         <groupId>com.github.iSnow</groupId>
         <artifactId>jpa-maven-plugin</artifactId>
-        <version>4-SNAPSHOT</version>
+        <version>7d6cbfc42fT</version>
         <executions>
             <execution>
                 <id>Generate entityClassnames.properties</id>
