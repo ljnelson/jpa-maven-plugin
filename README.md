@@ -15,12 +15,30 @@ of your run configuration.
 
 ## Quick Start
 
-## Compile and install the plugin
+### From Jitpack
+
+Look up the latest commit hash on [Jitpack](https://jitpack.io/#iSnow/jpa-maven-plugin) and include it in your pom.xml:
+
+    <plugin>
+        <groupId>com.github.iSnow</groupId>
+        <artifactId>jpa-maven-plugin</artifactId>
+        <version>4-SNAPSHOT</version>
+        <executions>
+            <execution>
+                <id>Generate entityClassnames.properties</id>
+                <goals>
+                    <goal>list-entity-classnames</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+
+### Compile and install the plugin
 
 Sorry about that, but the plugin is not on central. To build and use it locally, type `mvn install` in the terminal.
 The plugin will be installed into your .m2/repository and be available for local builds. CI pipelines will not like this.
 
-## Use in projects
+### Use in projects
 
 You should have a `persistence.xml` to be used for in
 `src/main/resources/META-INF`:
