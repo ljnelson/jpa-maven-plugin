@@ -6,9 +6,9 @@
     <maven>3.0.4</maven>
   </prerequisites>
 
-  <groupId>com.edugility</groupId>
+  <groupId>com.github.iSnow</groupId>
   <artifactId>jpa-maven-plugin</artifactId>
-  <version>3-SNAPSHOT</version>
+  <version>4-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <parent>
@@ -92,7 +92,7 @@
       </dependency>
 
       <dependency>
-        <groupId>net.sf.scannotation</groupId>
+        <groupId>org.scannotation</groupId>
         <artifactId>scannotation</artifactId>
         <version>${scannotationVersion}</version>
         <exclusions>
@@ -106,7 +106,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.18.2-GA</version>
+        <version>${javassistVersion}</version>
       </dependency>
 
     </dependencies>
@@ -134,7 +134,7 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sf.scannotation</groupId>
+      <groupId>org.scannotation</groupId>
       <artifactId>scannotation</artifactId>
     </dependency>
 
@@ -358,8 +358,8 @@
 
     <!-- Versions -->
     <findbugsMavenPluginVersion>2.5.2</findbugsMavenPluginVersion>
-    <javaxPersistenceVersion>2.0.5</javaxPersistenceVersion>
-    <junitVersion>4.11</junitVersion>
+    <javaxPersistenceVersion>2.2.1</javaxPersistenceVersion>
+    <junitVersion>4.13</junitVersion>
     <mavenAssemblyPluginVersion>2.4</mavenAssemblyPluginVersion>
     <mavenCleanPluginVersion>2.5</mavenCleanPluginVersion>
     <mavenCompilerPluginVersion>3.0</mavenCompilerPluginVersion>
@@ -381,15 +381,16 @@
     <mavenSitePluginVersion>3.2</mavenSitePluginVersion>
     <mavenSourcePluginVersion>2.2.1</mavenSourcePluginVersion>
     <mavenSurefirePluginVersion>2.13</mavenSurefirePluginVersion>
-    <scannotationVersion>1.0.2</scannotationVersion>
+    <scannotationVersion>1.0.3</scannotationVersion>
+    <javassistVersion>3.27.0-GA</javassistVersion>
     <siteMavenPluginVersion>0.9</siteMavenPluginVersion>
     <versionsMavenPluginVersion>2.0</versionsMavenPluginVersion>
 
     <!-- maven-compiler-plugin properties -->
     <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.verbose>false</maven.compiler.verbose>
 
     <!-- maven-javadoc-plugin properties -->
